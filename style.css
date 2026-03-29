@@ -141,9 +141,9 @@ body {
 /* ── ARM (pivots on strike) ── */
 .arm-wrap {
   position: absolute;
-  /* positioned so pivot point is top-right area */
   top: 2%;
-  left: 5%;
+  left: 50%;
+  transform: translateX(-50%);
   width: 88%;
   height: 85%;
   transform-origin: 88% 10%;   /* pivot near top-right = top of handle */
@@ -154,12 +154,12 @@ body {
   animation: gavelSwing .42s cubic-bezier(.3,0,.15,1) forwards;
 }
 @keyframes gavelSwing {
-  0%   { transform: rotate(0deg); }
-  22%  { transform: rotate(-46deg); }
-  46%  { transform: rotate(16deg); }
-  64%  { transform: rotate(-7deg); }
-  80%  { transform: rotate(3deg); }
-  100% { transform: rotate(0deg); }
+  0%   { transform: translateX(-50%) rotate(0deg); }
+  22%  { transform: translateX(-50%) rotate(-46deg); }
+  46%  { transform: translateX(-50%) rotate(16deg); }
+  64%  { transform: translateX(-50%) rotate(-7deg); }
+  80%  { transform: translateX(-50%) rotate(3deg); }
+  100% { transform: translateX(-50%) rotate(0deg); }
 }
 
 /* Handle — long tapered cylinder */
