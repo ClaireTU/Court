@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-TW" id="html-root">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="法槌"/>
+  <title>法槌 ⚖️</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════
+     LANGUAGE SELECTION SCREEN
+═══════════════════════════════════════ -->
+<div id="langScreen" class="lang-screen">
+  <div class="lang-inner">
+    <div class="lang-emblem">⚖</div>
+    <h1 class="lang-title">Judge's Gavel<br/>法　槌</h1>
+    <p class="lang-sub">Please select your language / 請選擇語言</p>
+    <div class="lang-btns">
+      <button class="lang-btn" onclick="setLang('zh')">
+        <span class="lang-flag">🇹🇼</span>
+        <span class="lang-name">中文版</span>
+        <span class="lang-desc">繁體中文</span>
+      </button>
+      <button class="lang-btn" onclick="setLang('en')">
+        <span class="lang-flag">🇺🇸</span>
+        <span class="lang-name">English</span>
+        <span class="lang-desc">English Version</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MAIN APP SCREEN
+═══════════════════════════════════════ -->
+<div id="appScreen" class="app-screen hidden">
+
+  <!-- top bar -->
+  <div class="top-bar">
+    <div class="bar-line"></div>
+    <div class="court-label" id="courtLabel">最高法院</div>
+    <div class="bar-line"></div>
+  </div>
+
+  <!-- GAVEL -->
+  <div class="gavel-area" id="gavelArea" onclick="strikeGavel()">
+
+    <!-- arm that holds the gavel (pivots) -->
+    <div class="arm-wrap" id="armWrap">
+      <!-- handle -->
+      <div class="handle"></div>
+      <!-- head -->
+      <div class="head-wrap">
+        <div class="head-end left-end"></div>
+        <div class="head-body">
+          <div class="head-ring left-ring"></div>
+          <div class="head-center"></div>
+          <div class="head-ring right-ring"></div>
+        </div>
+        <div class="head-end right-end"></div>
+      </div>
+    </div>
+
+    <!-- sound block / base -->
+    <div class="block-wrap">
+      <div class="block-top"></div>
+      <div class="block-body"></div>
+      <div class="block-base"></div>
+    </div>
+
+    <!-- ripple rings -->
+    <div class="ring" id="ring1"></div>
+    <div class="ring" id="ring2"></div>
+
+    <p class="tap-hint" id="tapHint">點擊敲槌</p>
+  </div>
+
+  <!-- ── FUNCTION BUTTONS ── -->
+  <div class="btn-grid">
+    <!-- Guilty -->
+    <button class="fn-btn btn-guilty" onclick="triggerGuilty()">
+      <span class="fn-icon">🔨</span>
+      <span class="fn-label" id="lblGuilty">有罪</span>
+      <span class="fn-sub" id="subGuilty">終身監禁不得假釋</span>
+    </button>
+
+    <!-- Silence -->
+    <button class="fn-btn btn-silence" onclick="triggerSilence()">
+      <span class="fn-icon">🔇</span>
+      <span class="fn-label" id="lblSilence">肅靜</span>
+    </button>
+
+    <!-- Recess -->
+    <button class="fn-btn btn-recess" onclick="triggerRecess()">
+      <span class="fn-icon">⏸</span>
+      <span class="fn-label" id="lblRecess">休庭</span>
+    </button>
+
+    <!-- Irrelevant -->
+    <button class="fn-btn btn-irrelevant" onclick="triggerIrrelevant()">
+      <span class="fn-icon">🚫</span>
+      <span class="fn-label" id="lblIrrelevant">與本案無關</span>
+    </button>
+
+    <!-- Not Guilty -->
+    <button class="fn-btn btn-notguilty" onclick="triggerNotGuilty()">
+      <span class="fn-icon">🕊</span>
+      <span class="fn-label" id="lblNotGuilty">當庭無罪釋放</span>
+    </button>
+
+    <!-- Record -->
+    <button class="fn-btn btn-record" onclick="openRecord()">
+      <span class="fn-icon">🎙</span>
+      <span class="fn-label" id="lblRecord">錄音設定</span>
+    </button>
+  </div>
+
+  <!-- switch language -->
+  <button class="switch-lang-btn" onclick="switchLang()" id="switchLangBtn">🌐 English</button>
+
+  <div class="bottom-bar"></div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     OVERLAYS
+═══════════════════════════════════════ -->
+
+<!-- Flash -->
+<div id="flash" class="flash"></div>
+
+<!-- Guilty verdict overlay -->
+<div id="verdictOv" class="overlay-full verdict-ov">
+  <div class="verdict-box">
+    <div class="verdict-stamp" id="verdictStamp">有罪</div>
+    <div class="verdict-sub" id="verdictSub">終身監禁不得假釋</div>
+  </div>
+</div>
+
+<!-- Silence overlay -->
+<div id="silenceOv" class="overlay-full silence-ov" onclick="closeOverlay('silenceOv')">
+  <div class="announce-box">
+    <div class="announce-main" id="txtSilence">肅靜！</div>
+    <div class="announce-latin" id="txtSilenceSub">SILENCE IN COURT</div>
+    <button class="ov-close" id="btnCloseSilence">解除</button>
+  </div>
+</div>
+
+<!-- Recess overlay -->
+<div id="recessOv" class="overlay-full recess-ov" onclick="closeOverlay('recessOv')">
+  <div class="announce-box">
+    <div class="announce-main" id="txtRecess">休庭</div>
+    <div class="announce-latin" id="txtRecessSub">COURT IS IN RECESS</div>
+    <div class="recess-gavel">⚖</div>
+    <button class="ov-close" id="btnCloseRecess">恢復</button>
+  </div>
+</div>
+
+<!-- Irrelevant overlay -->
+<div id="irrelevantOv" class="overlay-full irrelevant-ov" onclick="closeOverlay('irrelevantOv')">
+  <div class="announce-box">
+    <div class="announce-main small-txt" id="txtIrrelevant">該陳述與本案無關</div>
+    <div class="announce-latin" id="txtIrrelevantSub">IRRELEVANT TO THIS CASE</div>
+    <button class="ov-close" id="btnCloseIrrelevant">確定</button>
+  </div>
+</div>
+
+<!-- Not Guilty overlay -->
+<div id="notguiltyOv" class="overlay-full notguilty-ov" onclick="closeOverlay('notguiltyOv')">
+  <div class="announce-box">
+    <div class="announce-main" id="txtNotGuilty">無罪</div>
+    <div class="announce-latin" id="txtNotGuiltySub">NOT GUILTY — ACQUITTED</div>
+    <div class="dove-anim">🕊</div>
+    <button class="ov-close green-close" id="btnCloseNotGuilty">確定</button>
+  </div>
+</div>
+
+<!-- Record modal -->
+<div id="recordModal" class="modal-bg" onclick="closeRecordOutside(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <h2 class="modal-title" id="modalTitle">🎙 錄音設定</h2>
+    <p class="modal-desc" id="modalDesc">錄製你的「有罪」宣判聲音</p>
+
+    <div class="rec-status" id="recStatus">尚未錄音</div>
+    <div class="rec-timer" id="recTimer" style="display:none">⏺ 00:00</div>
+
+    <div class="rec-btns">
+      <button class="rec-btn start-btn" id="btnStartRec" onclick="startRecording()">
+        ⏺ 開始錄音
+      </button>
+      <button class="rec-btn stop-btn hidden" id="btnStopRec" onclick="stopRecording()">
+        ⏹ 停止錄音
+      </button>
+      <button class="rec-btn play-btn hidden" id="btnPlayRec" onclick="playRecording()">
+        ▶ 試聽
+      </button>
+      <button class="rec-btn del-btn hidden" id="btnDelRec" onclick="deleteRecording()">
+        🗑 刪除重錄
+      </button>
+    </div>
+
+    <div class="modal-toggle">
+      <label class="toggle-label" id="toggleLabel">
+        <input type="checkbox" id="useCustom" onchange="toggleCustom()"/>
+        使用自訂錄音
+      </label>
+    </div>
+
+    <button class="modal-close-btn" onclick="closeRecord()">關閉</button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
