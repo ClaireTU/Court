@@ -371,22 +371,60 @@ function sendToVerdictWriter() { const val = document.getElementById('chargeInpu
 function openVerdictWriter() { document.getElementById('verdictDoc').classList.add('hidden'); document.getElementById('verdictModal').classList.add('show'); }
 function closeVerdictWriter() { document.getElementById('verdictModal').classList.remove('show'); }
 function closeVerdictOutside(e) { if(e.target === document.getElementById('verdictModal')) closeVerdictWriter(); }
-function generateVerdict() {
-  const name = document.getElementById('defendantName').value.trim(), crime = document.getElementById('crimeInput').value.trim();
-  if(!name || !crime) { alert(lang === 'zh' ? '請填入被告姓名與罪名' : 'Please enter defendant name and charge'); return; }
-  const now = new Date(), dateStr = lang === 'zh' ? `中華民國${now.getFullYear()-1911}年${now.getMonth()+1}月${now.getDate()}日` : now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}), caseNum = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${Math.floor(Math.random()*9000+1000)}`;
-  let body = '';
-  if(lang === 'zh') {
-    body = `本院經詳細審理，認定被告${name}確已構成「${crime}」，且犯行明確，態度惡劣，毫無悔意。\n\n經本院法官獨立判斷，不受任何外力干擾（包含被告之淚水），判決如下：\n\n一、被告${name}判處終身監禁，不得假釋，不得上訴，不得求情。\n\n二、被告之財產充公，用於購置本院咖啡機一台。\n\n三、被告須公開向社會大眾道歉，道歉內容不得少於一千字。\n\n四、本院特別附記：被告之辯護詞精彩萬分，本院已列為反面教材。`;
-    document.getElementById('vdHeader').textContent = T.zh.vdHeader; document.getElementById('vdNum').textContent = `案號：${caseNum}　日期：${dateStr}`; document.getElementById('vdFooter').textContent = T.zh.vdFooter;
-  } else {
-    body = `Having carefully reviewed all evidence, this Court finds defendant ${name} GUILTY of the charge of "${crime}". The conduct was egregious, the attitude unrepentant.\n\nAfter independent judicial deliberation, uninfluenced by the defendant's tears, this Court rules as follows:\n\nI. The defendant ${name} is hereby sentenced to life imprisonment without possibility of parole, appeal, or mercy.\n\nII. All assets of the defendant are hereby confiscated for the purchase of a new coffee machine for the Court.\n\nIII. The defendant shall issue a public apology of no fewer than one thousand words.\n\nIV. The Court notes: the defense argument was fascinating. It has been archived as a cautionary tale.`;
-    document.getElementById('vdHeader').textContent = T.en.vdHeader; document.getElementById('vdNum').textContent = `Case No: ${caseNum}  |  Date: ${dateStr}`; document.getElementById('vdFooter').textContent = T.en.vdFooter;
+
+async function generateVerdict() {
+  const name = document.getElementById('defendantName').value.trim();
+  const crime = document.getElementById('crimeInput').value.trim();
+
+  if(!name || !crime) {
+    alert(lang === 'zh' ? '請填入被告姓名與罪名' : 'Please enter defendant name and charge');
+    return;
   }
-  document.getElementById('vdBody').textContent = body;
+
+  const apiKey = "AIzaSyDnk3aUDb7_jJowy_DvgWDl0QYWsS6p-y4"; 
+
+  const now = new Date();
+  const dateStr = lang === 'zh' ? `中華民國${now.getFullYear()-1911}年${now.getMonth()+1}月${now.getDate()}日` : now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  const caseNum = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${Math.floor(Math.random()*9000+1000)}`;
+
+  document.getElementById('vdHeader').textContent = lang === 'zh' ? T.zh.vdHeader : T.en.vdHeader;
+  document.getElementById('vdNum').textContent = lang === 'zh' ? `案號：${caseNum}　日期：${dateStr}` : `Case No: ${caseNum}  |  Date: ${dateStr}`;
+  document.getElementById('vdFooter').textContent = lang === 'zh' ? T.zh.vdFooter : T.en.vdFooter;
+
+  document.getElementById('vdBody').textContent = lang === 'zh' ? "法官正在絞盡腦汁撰寫判決書中...\n(AI 生成中 ⏳)" : "The Judge is writing the verdict...\n(AI Generating ⏳)";
   document.getElementById('verdictDoc').classList.remove('hidden');
-  playThud(0, .8);
+
   setTimeout(() => { document.getElementById('verdictDoc').scrollIntoView({behavior:'smooth'}); }, 100);
+
+  const systemPrompt = lang === 'zh'
+    ? `你現在是一位極度嚴厲、幽默且腦洞大開的最高法院法官。被告是「${name}」，被控訴的罪名是「${crime}」。請寫一段約 120 字的搞笑判決文，語氣要像真實的法律文書但內容極度荒謬。必須包含：1. 痛批其行為的動機。2. 宣告有罪。3. 針對這個罪名量身打造一個瞎到爆的客製化懲罰（例如：罰抄寫、勞動服務、奇怪的限制等）。不需寫標題，直接輸出內文。`
+    : `You are a strict, hilarious, and highly creative Supreme Court Judge. The defendant is "${name}" and the charge is "${crime}". Write a funny, 100-word verdict. Sound legally formal but utterly ridiculous in content. Include: 1. A harsh critique of their motive. 2. A declaration of GUILTY. 3. A highly specific, bizarre, and customized punishment tailored to this exact crime. Do not include titles, just the verdict body.`;
+
+  try {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: systemPrompt }] }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const aiText = data.candidates[0].content.parts[0].text;
+
+    document.getElementById('vdBody').textContent = aiText;
+    playThud(0, 0.8);
+
+  } catch (error) {
+    console.error(error);
+    document.getElementById('vdBody').textContent = lang === 'zh'
+      ? "❌ 生成失敗！\n可能是網路連線異常，或法官暫時罷工中，請稍後再試。"
+      : "❌ Generation failed!\nNetwork error or the Judge is on strike. Please try again.";
+  }
 }
 
 function shareVerdict() {
