@@ -340,20 +340,30 @@ let lang='zh',busy=false,volume=0.8,convictions=0,currentCharge='';
 let mediaRecorder=null,recChunks=[],customAudioURL=null,customAudioEl=null,useCustomAudio=false,recTimerID=null,recSeconds=0;
 const ACtx=window.AudioContext||window.webkitAudioContext;let _actx=null;
 function getAC(){if(!_actx)_actx=new ACtx();if(_actx.state==='suspended')_actx.resume();return _actx;}
-function playThud(delay=0,vol=1.0){try{const c=getAC(),t=c.currentTime+delay,sr=c.sampleRate,len=Math.floor(sr*1.1),buf=c.createBuffer(1,len,sr),d=buf.getChannelData(0);for(let i=0;i<len;i++){const s=i/sr;d[i]=Math.exp(-s*16)*Math.sin(2*Math.PI*68*s)*1.2+Math.exp(-s*58)*(Math.random()*2-1)*0.5+Math.exp(-s*7)*Math.sin(2*Math.PI*180*s)*0.28+Math.exp(-s*12)*Math.sin(2*Math.PI*105*s)*0.44;}const src=c.createBufferSource();src.buffer=buf;const cmp=c.createDynamicsCompressor();cmp.threshold.value=-4;cmp.ratio.value=9;cmp.attack.value=0.001;cmp.release.value=0.28;const bass=c.createBiquadFilter();bass.type='lowshelf';bass.frequency.value=130;bass.gain.value=10;const g=c.createGain();g.gain.setValueAtTime(vol*volume*1.7,t);g.gain.exponentialRampToValueAtTime(0.001,t+1.0);src.connect(bass);bass.connect(cmp);cmp.connect(g);g.connect(c.destination);src.start(t);}catch(e){}}
-function setVolume(v){volume=v/100;}
-function playSilenceThree(){playThud(0,1);playThud(.22,.9);playThud(.44,.8);}
-function setLang(l){lang=l;applyTranslations();document.getElementById('langScreen').classList.add('hidden');document.getElementById('appScreen').classList.remove('hidden');}
-function switchLang(){lang=lang==='zh'?'en':'zh';applyTranslations();}
-function applyTranslations(){const t=T[lang];[['courtLabel','court'],['tapHint','tapHint'],['lblGuilty','lblGuilty'],['subGuilty','subGuilty'],['lblSilence','lblSilence'],['lblRecess','lblRecess'],['lblIrrelevant','lblIrrelevant'],['lblNotGuilty','lblNotGuilty'],['lblRecord','lblRecord'],['lblCharge','lblCharge'],['lblVerdictWriter','lblVerdictWriter'],['lblQuote','lblQuote'],['lblDeath','lblDeath'],['subDeath','subDeath'],['deathStamp','deathMain'],['deathSub','deathSub'],['btnCloseDeath','closeDeath'],['switchLangBtn','switchBtn'],['verdictStamp','verdictMain'],['verdictSub','verdictSub'],['txtSilence','silenceMain'],['txtSilenceSub','silenceSub'],['btnCloseSilence','closeSilence'],['txtRecess','recessMain'],['txtRecessSub','recessSub'],['btnCloseRecess','closeRecess'],['txtIrrelevant','irrelMain'],['txtIrrelevantSub','irrelSub'],['btnCloseIrrelevant','closeIrrel'],['txtNotGuilty','ngMain'],['txtNotGuiltySub','ngSub'],['btnCloseNotGuilty','closeNg'],['counterLbl','counterLbl'],['modalTitle','modalTitle'],['modalDesc','modalDesc'],['btnStartRec','btnStartRec'],['btnStopRec','btnStopRec'],['btnPlayRec','btnPlayRec'],['btnDelRec','btnDelRec'],['chargeTitleLbl','chargeTitleLbl'],['verdictWriterTitleLbl','verdictWriterTitleLbl'],['verdictWriterDescLbl','verdictWriterDescLbl']].forEach(([id,key])=>{const el=document.getElementById(id);if(el&&t[key]!==undefined)el.textContent=t[key];});const tl=document.querySelector('.toggle-label');if(tl)tl.lastChild.textContent=' '+t.toggleLabel;document.querySelectorAll('.modal-close-btn').forEach(b=>b.textContent=t.closeModal);updateRecStatus();}
-function doSwing(){const arm=document.getElementById('armWrap');arm.classList.remove('strike');void arm.offsetWidth;arm.classList.add('strike');arm.addEventListener('animationend',()=>arm.classList.remove('strike'),{once:true});['ring1','ring2'].forEach(id=>{const r=document.getElementById(id);r.classList.remove('pop');void r.offsetWidth;r.classList.add('pop');});const fl=document.getElementById('flash');fl.classList.remove('go');void fl.offsetWidth;fl.classList.add('go');if(navigator.vibrate)navigator.vibrate([70]);}
-function strikeGavel(){if(busy)return;playThud();doSwing();}
-function triggerGuilty(){if(busy)return;busy=true;playThud();doSwing();if(navigator.vibrate)navigator.vibrate([100,40,80]);if(useCustomAudio&&customAudioURL){new Audio(customAudioURL).play().catch(()=>{});}setTimeout(()=>{const ov=document.getElementById('verdictOv');ov.classList.add('show');setTimeout(()=>{ov.classList.remove('show');convictions++;document.getElementById('convictionCount').textContent=convictions;busy=false;},1850);},160);}
-function triggerSilence(){playSilenceThree();if(navigator.vibrate)navigator.vibrate([80,50,80,50,80]);doSwing();document.getElementById('silenceOv').classList.add('show');}
-function triggerRecess(){playThud(0,1);playThud(.28,.85);if(navigator.vibrate)navigator.vibrate([120,60,120]);doSwing();document.getElementById('recessOv').classList.add('show');}
-function triggerIrrelevant(){playThud();if(navigator.vibrate)navigator.vibrate([60]);doSwing();document.getElementById('irrelevantOv').classList.add('show');}
-function triggerNotGuilty(){playThud(0,.8);playThud(.22,.65);if(navigator.vibrate)navigator.vibrate([60,40,60]);doSwing();document.getElementById('notguiltyOv').classList.add('show');}
-function triggerDeath(){if(busy)return;busy=true;playThud(0,1.2);playThud(.15,1.0);playThud(.3,.9);doSwing();if(navigator.vibrate)navigator.vibrate([200,50,200,50,200]);setTimeout(()=>{document.getElementById('deathOv').classList.add('show');busy=false;},200);}
+function playThud(delay = 0.18, vol = 1.0) {
+  try {
+    const c = getAC(), t = c.currentTime + delay, sr = c.sampleRate, len = Math.floor(sr * 1.1), buf = c.createBuffer(1, len, sr), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) {
+      const s = i / sr;
+      d[i] = Math.exp(-s * 25) * Math.sin(2 * Math.PI * 85 * s) * 1.0 +
+             Math.exp(-s * 90) * (Math.random() * 2 - 1) * 0.9 +
+             Math.exp(-s * 40) * Math.sin(2 * Math.PI * 600 * s) * 0.4 +
+             Math.exp(-s * 15) * Math.sin(2 * Math.PI * 200 * s) * 0.3;
+    }
+    const src = c.createBufferSource(); src.buffer = buf;
+    const cmp = c.createDynamicsCompressor();
+    cmp.threshold.value = -4; cmp.ratio.value = 9; cmp.attack.value = 0.001; cmp.release.value = 0.28;
+    const eq = c.createBiquadFilter(); eq.type = 'highshelf'; eq.frequency.value = 800; eq.gain.value = 4;
+    const g = c.createGain(); g.gain.setValueAtTime(vol * volume * 1.6, t); g.gain.exponentialRampToValueAtTime(0.001, t + 1.0);
+    src.connect(eq); eq.connect(cmp); cmp.connect(g); g.connect(c.destination);
+    src.start(t);
+  } catch (e) {}
+}
+
+function playSilenceThree() { playThud(0.18, 1); playThud(0.40, .9); playThud(0.62, .8); }
+function triggerRecess() { playThud(0.18, 1); playThud(0.46, .85); if (navigator.vibrate) navigator.vibrate([120, 60, 120]); doSwing(); document.getElementById('recessOv').classList.add('show'); }
+function triggerNotGuilty() { playThud(0.18, .8); playThud(0.40, .65); if (navigator.vibrate) navigator.vibrate([60, 40, 60]); doSwing(); document.getElementById('notguiltyOv').classList.add('show'); }
+function triggerDeath() { if (busy) return; busy = true; playThud(0.18, 1.2); playThud(0.33, 1.0); playThud(0.48, .9); doSwing(); if (navigator.vibrate) navigator.vibrate([200, 50, 200, 50, 200]); setTimeout(() => { document.getElementById('deathOv').classList.add('show'); busy = false; }, 200); }
 function closeOverlay(id){document.getElementById(id).classList.remove('show');if(id==='verdictOv'||id==='deathOv')busy=false;}
 function triggerQuote(){const pool=lang==='zh'?QUOTES_ZH:QUOTES_EN;const pick=pool[Math.floor(Math.random()*pool.length)];document.getElementById('quoteText').textContent=pick.q;document.getElementById('quoteAttr').textContent='— '+pick.a;playThud(0,.5);document.getElementById('quoteOv').classList.add('show');}
 function openCharge(){document.getElementById('chargeResult').textContent=lang==='zh'?'按下按鈕產生罪名':'Press button to generate a charge';document.getElementById('chargeInput').value='';document.getElementById('chargeModal').classList.add('show');}
