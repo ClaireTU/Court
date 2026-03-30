@@ -250,13 +250,13 @@ function openVerdictWriter(){document.getElementById('verdictDoc').classList.add
 function closeVerdictWriter(){document.getElementById('verdictModal').classList.remove('show');}
 function closeVerdictOutside(e){if(e.target===document.getElementById('verdictModal'))closeVerdictWriter();}
 
-/* ✅ 修復版 generateVerdict — 改用 gemini-2.0-flash + 自動重試 + 離線備用 */
+
 async function generateVerdict(){
   const name=document.getElementById('defendantName').value.trim();
   const crime=document.getElementById('crimeInput').value.trim();
   if(!name||!crime){alert(lang==='zh'?'請填入被告姓名與罪名':'Please enter defendant name and charge');return;}
 
-  const apiKey="YOUR_API_KEY_HERE";
+  const apiKey="AIzaSyDnk3aUDb7_jJowy_DvgWDl0QYWsS6p-y4";
   const now=new Date();
   const dateStr=lang==='zh'?`中華民國${now.getFullYear()-1911}年${now.getMonth()+1}月${now.getDate()}日`:now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   const caseNum=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${Math.floor(Math.random()*9000+1000)}`;
