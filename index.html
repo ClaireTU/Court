@@ -41,21 +41,43 @@
     .bar-line { flex:1; height:1px; background:linear-gradient(90deg,transparent,rgba(200,168,75,.3),transparent); }
     .court-label { font-family:'Playfair Display',serif; font-weight:700; font-size:clamp(13px,3.5vw,16px); color:var(--gold); letter-spacing:.2em; white-space:nowrap; text-shadow:0 0 16px rgba(200,168,75,.25); }
 
-    /* GAVEL */
+    /* --- 🌟 3D GAVEL AREA (全新立體建模) 🌟 --- */
     .gavel-area { position:relative; width:min(320px,85vw); height:min(260px,56vw); display:flex; flex-direction:column; align-items:center; justify-content:flex-end; cursor:pointer; flex-shrink:0; margin:4px 0; }
-    .arm-wrap { position:absolute; bottom:44px; left:calc(50% + 105px); transform: translateX(-50%) rotate(-45deg); transform-origin: 50% 100%; display:flex; flex-direction:column; align-items:center; z-index:2; }
+    
+    /* 整支法槌的陰影 */
+    .arm-wrap { position:absolute; bottom:44px; left:calc(50% + 105px); transform: translateX(-50%) rotate(-45deg); transform-origin: 50% 100%; display:flex; flex-direction:column; align-items:center; z-index:2; filter: drop-shadow(4px 10px 8px rgba(0,0,0,0.7)); }
     .arm-wrap.strike { animation:swingDown .3s cubic-bezier(.6,0,.3,1) forwards; }
     @keyframes swingDown { 0% { transform: translateX(-50%) rotate(-45deg); } 65% { transform: translateX(-50%) rotate(5deg); } 100% { transform: translateX(-50%) rotate(0deg); } }
-    .head-wrap { display:flex; align-items:center; }
-    .head-body { width:56px; height:34px; background:linear-gradient(180deg,#c8a050,#9a7830,#705820); border-radius:4px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,.5),inset 0 2px 4px rgba(255,220,120,.15); }
-    .head-end { width:16px; height:42px; background:linear-gradient(180deg,#d4b060,#a88838,#7a6020); border-radius:50%; box-shadow:0 3px 8px rgba(0,0,0,.4); }
-    .head-ring { width:4px; height:26px; background:rgba(255,220,120,.2); border-radius:2px; }
-    .head-center { width:18px; height:26px; background:linear-gradient(180deg,rgba(255,220,120,.08),transparent); border-radius:2px; }
-    .handle { width:8px; height:90px; background:linear-gradient(180deg,#b08430,#8a6520,#6a4c18); border-radius:4px; box-shadow:inset -2px 0 4px rgba(0,0,0,.4),2px 2px 8px rgba(0,0,0,.5); }
-    .block-wrap { position:absolute; bottom:0; z-index:1; display:flex; flex-direction:column; align-items:center; }
-    .block-top { width:100px; height:10px; background:linear-gradient(180deg,#a08040,#7a6028); border-radius:4px 4px 0 0; box-shadow:0 -2px 8px rgba(200,168,75,.15); }
-    .block-body { width:90px; height:18px; background:linear-gradient(180deg,#8a6c30,#6a5020); box-shadow:inset 0 2px 6px rgba(0,0,0,.3); }
-    .block-base { width:110px; height:8px; background:linear-gradient(180deg,#6a5020,#4a3818); border-radius:0 0 4px 4px; box-shadow:0 4px 14px rgba(0,0,0,.5); }
+    
+    /* 槌頭總成 */
+    .head-wrap { display:flex; align-items:center; z-index:2; position:relative; }
+    
+    /* 槌頭木身 (增加圓柱反光漸層) */
+    .head-body { width:66px; height:42px; background:linear-gradient(0deg, #1f0b02 0%, #4a1c0d 20%, #7d3318 50%, #4a1c0d 80%, #1f0b02 100%); display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 12px rgba(0,0,0,0.8); position:relative; z-index:1; }
+    
+    /* 槌頭兩側打擊面 (放射狀漸層製造凸起感) */
+    .head-end { width:22px; height:50px; background:radial-gradient(ellipse at center, #7d3318 0%, #2a0f05 80%); border-radius:50%; box-shadow:inset -3px 0 6px rgba(255,255,255,0.15), inset 3px 0 8px rgba(0,0,0,0.9), 0 0 6px rgba(0,0,0,0.6); z-index:2; position:relative; }
+    .left-end { margin-right:-10px; }
+    .right-end { margin-left:-10px; }
+    
+    /* 槌頭上的金屬細環 (亮金色反光) */
+    .head-ring { width:5px; height:46px; background:linear-gradient(0deg, #4a3000 0%, #b8860b 20%, #fadd70 50%, #b8860b 80%, #4a3000 100%); border-radius:2px; box-shadow:0 0 3px rgba(0,0,0,0.8), inset 0 0 2px rgba(255,255,255,0.5); z-index:3; margin:0 -1px; }
+    
+    /* 槌頭上的金屬寬帶 */
+    .head-center { width:22px; height:46px; background:linear-gradient(0deg, #4a3000 0%, #d4af37 25%, #fff0a0 50%, #d4af37 75%, #4a3000 100%); border-radius:3px; box-shadow:inset 0 0 6px rgba(0,0,0,0.6), 0 0 4px rgba(0,0,0,0.7); z-index:3; }
+    
+    /* 握柄 (圓柱反光 + 底部金屬裝飾) */
+    .handle { width:16px; height:100px; background:linear-gradient(90deg, #1f0b02 0%, #4a1c0d 30%, #7d3318 50%, #3a1508 80%, #0a0301 100%); border-radius:3px 3px 8px 8px; box-shadow:inset 0 -15px 15px rgba(0,0,0,0.9), 2px 2px 5px rgba(0,0,0,0.5); margin-top:-8px; z-index:1; position:relative; }
+    .handle::after { content:''; position:absolute; bottom:20px; left:-1px; right:-1px; height:16px; background:linear-gradient(90deg, #4a3000 0%, #e6ca54 50%, #4a3000 100%); border-radius:2px; box-shadow:0 2px 5px rgba(0,0,0,0.8); }
+
+    /* 底座總成 (加厚、加寬、金屬邊框) */
+    .block-wrap { position:absolute; bottom:0; z-index:1; display:flex; flex-direction:column; align-items:center; filter: drop-shadow(0 12px 15px rgba(0,0,0,0.9)); }
+    .block-top { width:130px; height:18px; background:radial-gradient(ellipse at 50% 20%, #7d3318 0%, #2a0f05 90%); border-radius:50% 50% 0 0; border-bottom:2px solid #1a0802; box-shadow:inset 0 2px 5px rgba(255,255,255,0.1); }
+    .block-body { width:130px; height:22px; background:linear-gradient(90deg, #1f0b02 0%, #4a1c0d 20%, #6e2c16 50%, #4a1c0d 80%, #1f0b02 100%); position:relative; display:flex; align-items:center; justify-content:center; }
+    .block-body::before { content:''; position:absolute; top:3px; bottom:3px; left:-3px; right:-3px; background:linear-gradient(90deg, #4a3000 0%, #fadd70 50%, #4a3000 100%); border-radius:2px; box-shadow:0 2px 6px rgba(0,0,0,0.7), inset 0 0 2px rgba(255,255,255,0.5); }
+    .block-base { width:150px; height:16px; background:linear-gradient(90deg, #1a0802 0%, #4a1c0d 50%, #1a0802 100%); border-radius:0 0 8px 8px; box-shadow:inset 0 3px 6px rgba(0,0,0,0.8); }
+
+    /* 震波特效 */
     .ring { position:absolute; bottom:36px; left:50%; width:0; height:0; border-radius:50%; border:2px solid rgba(200,168,75,.4); transform:translate(-50%,0); opacity:0; pointer-events:none; z-index:0; }
     .ring.pop { animation:ringPop .6s ease-out forwards; }
     #ring2.pop { animation-delay:.08s; }
@@ -63,7 +85,7 @@
     .tap-hint { position:absolute; bottom:-8px; font-size:11px; color:rgba(200,168,75,.3); letter-spacing:.15em; animation:hintPulse 2.5s ease-in-out infinite; }
     @keyframes hintPulse { 0%,100%{opacity:.3} 50%{opacity:.6} }
 
-    /* BUTTONS */
+    /* --- 按鈕與其他 UI 樣式 --- */
     .btn-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; width:min(360px,92vw); padding:0 4px; flex-shrink:0; }
     .fn-btn { position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; padding:12px 6px; border:1px solid rgba(200,168,75,.2); border-radius:8px; background:rgba(200,168,75,.04); cursor:pointer; transition:all .2s; }
     .fn-btn::before { content:''; position:absolute; inset:0; background:rgba(200,168,75,.06); opacity:0; transition:opacity .2s; }
@@ -165,11 +187,13 @@
     .toggle-label { font-size:13px; color:rgba(200,168,75,.5); display:flex; align-items:center; gap:8px; cursor:pointer; }
     .toggle-label input[type=checkbox] { accent-color:var(--gold); width:16px; height:16px; }
 
-    /* COUNTER & VOLUME */
+    /* COUNTER */
     .counter-row { display:flex; justify-content:center; margin:0 0 4px; flex-shrink:0; }
     .counter-box { display:flex; align-items:center; gap:6px; padding:5px 16px; border:1px solid rgba(200,168,75,.18); border-radius:20px; background:rgba(200,168,75,.05); }
     .counter-num { font-family:'Playfair Display',serif; font-weight:900; font-size:22px; color:var(--gold-lt); text-shadow:0 0 12px rgba(200,168,75,.4); min-width:28px; text-align:center; }
     .counter-lbl { font-size:11px; color:rgba(200,168,75,.45); letter-spacing:.12em; }
+
+    /* VOLUME */
     .vol-row { display:flex; align-items:center; gap:8px; width:min(340px,92vw); margin:6px 0 2px; flex-shrink:0; }
     .vol-icon { font-size:14px; }
     .vol-row input[type=range] { flex:1; accent-color:var(--gold); height:3px; cursor:pointer; }
@@ -182,12 +206,14 @@
     .quote-text { font-family:'Noto Serif TC',serif; font-weight:700; font-size:clamp(16px,4.5vw,24px); color:var(--gold-lt); text-align:center; line-height:1.7; letter-spacing:.06em; text-shadow:0 0 20px rgba(200,168,75,.3); }
     .quote-attr { font-family:'Playfair Display',serif; font-style:italic; font-size:12px; color:rgba(200,168,75,.45); letter-spacing:.2em; }
 
-    /* CHARGE & VERDICT WRITER */
+    /* CHARGE */
     .charge-result { width:100%; padding:12px 14px; background:rgba(200,168,75,.06); border:1px solid rgba(200,168,75,.2); border-radius:4px; font-size:14px; font-weight:700; color:var(--gold-lt); text-align:center; letter-spacing:.06em; line-height:1.5; min-height:48px; display:flex; align-items:center; justify-content:center; }
     .charge-divider { font-size:11px; color:rgba(200,168,75,.3); letter-spacing:.2em; text-align:center; width:100%; margin:2px 0; }
     .charge-input { width:100%; padding:9px 12px; background:rgba(255,255,255,.04); border:1px solid rgba(200,168,75,.2); border-radius:4px; color:var(--gold-lt); font-family:'Noto Serif TC',serif; font-size:13px; outline:none; letter-spacing:.06em; }
     .charge-input:focus { border-color:rgba(200,168,75,.5); }
     .charge-input::placeholder { color:rgba(200,168,75,.25); }
+
+    /* VERDICT WRITER */
     .verdict-modal-box { max-height:88vh; overflow-y:auto; }
     .verdict-doc { width:100%; margin-top:10px; background:#1a1408; border:1px solid rgba(200,168,75,.3); border-radius:4px; padding:16px 14px; }
     .vd-header { font-family:'Noto Serif TC',serif; font-weight:900; font-size:15px; color:var(--gold-lt); text-align:center; letter-spacing:.15em; border-bottom:1px solid rgba(200,168,75,.2); padding-bottom:8px; margin-bottom:8px; }
@@ -213,12 +239,29 @@
 <div id="appScreen" class="app-screen hidden">
   <div class="top-bar"><div class="bar-line"></div><div class="court-label" id="courtLabel">最高法院</div><div class="bar-line"></div></div>
   <div class="counter-row"><div class="counter-box"><span class="counter-num" id="convictionCount">0</span><span class="counter-lbl" id="counterLbl">次定罪</span></div></div>
+  
   <div class="gavel-area" id="gavelArea" onclick="strikeGavel()">
-    <div class="arm-wrap" id="armWrap"><div class="head-wrap"><div class="head-end left-end"></div><div class="head-body"><div class="head-ring left-ring"></div><div class="head-center"></div><div class="head-ring right-ring"></div></div><div class="head-end right-end"></div></div><div class="handle"></div></div>
-    <div class="block-wrap"><div class="block-top"></div><div class="block-body"></div><div class="block-base"></div></div>
+    <div class="arm-wrap" id="armWrap">
+      <div class="head-wrap">
+        <div class="head-end left-end"></div>
+        <div class="head-body">
+          <div class="head-ring left-ring"></div>
+          <div class="head-center"></div>
+          <div class="head-ring right-ring"></div>
+        </div>
+        <div class="head-end right-end"></div>
+      </div>
+      <div class="handle"></div>
+    </div>
+    <div class="block-wrap">
+      <div class="block-top"></div>
+      <div class="block-body"></div>
+      <div class="block-base"></div>
+    </div>
     <div class="ring" id="ring1"></div><div class="ring" id="ring2"></div>
     <p class="tap-hint" id="tapHint">點擊敲槌</p>
   </div>
+
   <div class="vol-row"><span class="vol-icon">🔈</span><input type="range" id="volSlider" min="0" max="100" value="80" oninput="setVolume(this.value)"/><span class="vol-icon">🔊</span></div>
   <div class="btn-grid">
     <button class="fn-btn btn-guilty" onclick="triggerGuilty()"><span class="fn-icon">🔨</span><span class="fn-label" id="lblGuilty">有罪</span><span class="fn-sub" id="subGuilty">終身監禁不得假釋</span></button>
@@ -235,6 +278,7 @@
   <button class="switch-lang-btn" onclick="switchLang()" id="switchLangBtn">🌐 English</button>
   <div class="bottom-bar"></div>
 </div>
+
 <div id="flash" class="flash"></div>
 <div id="verdictOv" class="overlay-full verdict-ov"><div class="verdict-box"><div class="verdict-stamp" id="verdictStamp">有罪</div><div class="verdict-sub" id="verdictSub">終身監禁不得假釋</div></div></div>
 <div id="deathOv" class="overlay-full death-ov" onclick="closeOverlay('deathOv')"><div class="death-box"><div class="death-skull">💀</div><div class="death-stamp" id="deathStamp">死刑</div><div class="death-sub" id="deathSub">立即執行，不得上訴</div><button class="ov-close" style="border-color:rgba(255,0,0,.3);color:rgba(255,80,80,.5);" id="btnCloseDeath">確定</button></div></div>
@@ -243,8 +287,11 @@
 <div id="irrelevantOv" class="overlay-full irrelevant-ov" onclick="closeOverlay('irrelevantOv')"><div class="announce-box"><div class="announce-main small-txt" id="txtIrrelevant">該陳述與本案無關</div><div class="announce-latin" id="txtIrrelevantSub">IRRELEVANT TO THIS CASE</div><button class="ov-close" id="btnCloseIrrelevant">確定</button></div></div>
 <div id="notguiltyOv" class="overlay-full notguilty-ov" onclick="closeOverlay('notguiltyOv')"><div class="announce-box"><div class="announce-main" id="txtNotGuilty">無罪</div><div class="announce-latin" id="txtNotGuiltySub">NOT GUILTY — ACQUITTED</div><div class="dove-anim">🕊</div><button class="ov-close green-close" id="btnCloseNotGuilty">確定</button></div></div>
 <div id="quoteOv" class="overlay-full quote-ov" onclick="closeOverlay('quoteOv')"><div class="quote-box"><div class="quote-gavel">👨‍⚖️</div><div class="quote-text" id="quoteText"></div><div class="quote-attr" id="quoteAttr">— 法官大人</div><button class="ov-close" style="color:rgba(200,168,75,.6);">收下教誨</button></div></div>
+
 <div id="chargeModal" class="modal-bg" onclick="closeChargeOutside(event)"><div class="modal-box" onclick="event.stopPropagation()"><h2 class="modal-title">🎲 <span id="chargeTitleLbl">罪名產生器</span></h2><div class="charge-result" id="chargeResult">按下按鈕產生罪名</div><div class="rec-btns" style="flex-direction:column;"><button class="rec-btn start-btn" style="width:100%;" id="btnRandomCharge" onclick="randomCharge()">🎲 隨機產生</button><div class="charge-divider">— 或自行輸入罪名 —</div><input type="text" class="charge-input" id="chargeInput" placeholder="輸入你的罪名..."/><button class="rec-btn" style="width:100%;background:rgba(139,0,0,.18);border-color:rgba(180,0,0,.5);color:#ff8888;" id="btnToWriter" onclick="sendToVerdictWriter()">📜 送交判決書</button></div><button class="modal-close-btn" onclick="closeCharge()">關閉</button></div></div>
+
 <div id="verdictModal" class="modal-bg" onclick="closeVerdictOutside(event)"><div class="modal-box verdict-modal-box" onclick="event.stopPropagation()"><h2 class="modal-title">📜 <span id="verdictWriterTitleLbl">判決書產生器</span></h2><p class="modal-desc" id="verdictWriterDescLbl">輸入被告資訊，本院即刻製發判決書</p><input type="text" class="charge-input" id="defendantName" placeholder="被告姓名"/><input type="text" class="charge-input" id="crimeInput" placeholder="罪名"/><button class="rec-btn start-btn" style="width:100%;" id="btnGenerateVerdict" onclick="generateVerdict()">⚖️ 製發判決書</button><div id="verdictDoc" class="verdict-doc hidden"><div class="vd-header" id="vdHeader">最高法院判決書</div><div class="vd-num" id="vdNum"></div><div class="vd-body" id="vdBody"></div><div class="vd-seal">⚖</div><div class="vd-footer" id="vdFooter"></div><button class="rec-btn play-btn" style="width:100%;margin-top:8px;" id="btnShareVerdict" onclick="shareVerdict()">📸 截圖分享</button></div><button class="modal-close-btn" onclick="closeVerdictWriter()">關閉</button></div></div>
+
 <div id="recordModal" class="modal-bg" onclick="closeRecordOutside(event)"><div class="modal-box" onclick="event.stopPropagation()"><h2 class="modal-title" id="modalTitle">🎙 錄音設定</h2><p class="modal-desc" id="modalDesc">錄製你的「有罪」宣判聲音</p><div class="rec-status" id="recStatus">尚未錄音</div><div class="rec-timer" id="recTimer" style="display:none">⏺ 00:00</div><div class="rec-btns"><button class="rec-btn start-btn" id="btnStartRec" onclick="startRecording()">⏺ 開始錄音</button><button class="rec-btn stop-btn hidden" id="btnStopRec" onclick="stopRecording()">⏹ 停止錄音</button><button class="rec-btn play-btn hidden" id="btnPlayRec" onclick="playRecording()">▶ 試聽</button><button class="rec-btn del-btn hidden" id="btnDelRec" onclick="deleteRecording()">🗑 刪除重錄</button></div><div class="modal-toggle"><label class="toggle-label"><input type="checkbox" id="useCustom" onchange="toggleCustom()"/> 使用自訂錄音</label></div><button class="modal-close-btn" onclick="closeRecord()">關閉</button></div></div>
 
 <script>
@@ -262,7 +309,6 @@ let _reverbBuf = null;
 
 function getAC() { if (!_actx) _actx = new ACtx(); if (_actx.state === 'suspended') _actx.resume(); return _actx; }
 
-/* 建立法庭殘響 (Reverb) 的脈衝響應 - 加長至 2.5 秒大空間 */
 function getReverbBuffer(c) {
   if (_reverbBuf) return _reverbBuf;
   const len = c.sampleRate * 2.5; 
@@ -276,29 +322,22 @@ function getReverbBuffer(c) {
   return _reverbBuf;
 }
 
-/* 重新調校：清脆不拖泥帶水的「ㄎㄧㄚˉ」聲 + 法庭回音 */
 function playThud(delay = 0, vol = 1.0) {
   try {
     const c = getAC(), t = c.currentTime + delay;
     const sr = c.sampleRate;
-    const len = Math.floor(sr * 0.15); // 短促的撞擊時間
+    const len = Math.floor(sr * 0.15);
     const buf = c.createBuffer(1, len, sr);
     const d = buf.getChannelData(0);
     for (let i = 0; i < len; i++) {
       const s = i / sr;
-      // ㄎㄧㄚ：極高頻的瞬間碎裂聲 (Snap)
       const snap = Math.exp(-s * 400) * Math.sin(2 * Math.PI * 1800 * s) * 1.5;
-      // ㄧㄚ：清脆的中高頻實木共鳴 (Wood body)
       const wood = Math.exp(-s * 100) * Math.sin(2 * Math.PI * 650 * s) * 1.2;
-      // 木頭撞擊瞬間的白噪音摩擦 (Impact friction)
       const noise = Math.exp(-s * 600) * (Math.random() * 2 - 1) * 1.0;
-      // 保留一點點底座聲音，但不沉悶 (Slight base)
       const bass = Math.exp(-s * 60) * Math.sin(2 * Math.PI * 150 * s) * 0.3;
       d[i] = snap + wood + noise + bass;
     }
     const src = c.createBufferSource(); src.buffer = buf;
-
-    // 稍微壓縮，讓「ㄎㄧㄚ」的聲音更集中響亮
     const cmp = c.createDynamicsCompressor();
     cmp.threshold.value = -10; cmp.ratio.value = 10; cmp.attack.value = 0.001; cmp.release.value = 0.05;
 
@@ -306,9 +345,9 @@ function playThud(delay = 0, vol = 1.0) {
     convolver.buffer = getReverbBuffer(c);
 
     const dryGain = c.createGain(); 
-    dryGain.gain.setValueAtTime(vol * volume * 2.2, t); // 清脆主音量
+    dryGain.gain.setValueAtTime(vol * volume * 2.2, t);
     const wetGain = c.createGain(); 
-    wetGain.gain.setValueAtTime(vol * volume * 0.8, t); // 法庭回音量
+    wetGain.gain.setValueAtTime(vol * volume * 0.8, t);
 
     src.connect(cmp);
     cmp.connect(dryGain);
@@ -322,7 +361,6 @@ function playThud(delay = 0, vol = 1.0) {
   } catch (e) {}
 }
 
-/* 合成死刑專用槍擊聲 */
 function playGunshot(delay = 0, vol = 1.0) {
   try {
     const c = getAC(), t = c.currentTime + delay;
@@ -330,27 +368,20 @@ function playGunshot(delay = 0, vol = 1.0) {
     const d = buf.getChannelData(0);
     for(let i=0; i<d.length; i++) {
        const s = i/c.sampleRate;
-       d[i] = (Math.random()*2-1) * Math.exp(-s * 4); // 帶有長尾巴的白噪音
+       d[i] = (Math.random()*2-1) * Math.exp(-s * 4);
     }
     const src = c.createBufferSource(); src.buffer = buf;
-    
-    // 利用低通濾波器做出沉悶的爆裂感
     const filter = c.createBiquadFilter();
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(4000, t);
     filter.frequency.exponentialRampToValueAtTime(200, t+0.5);
-    
-    // 強力增益製造震撼力
     const gain = c.createGain();
     gain.gain.setValueAtTime(vol * volume * 3.0, t);
     gain.gain.exponentialRampToValueAtTime(0.01, t+1.5);
-    
     const convolver = c.createConvolver();
     convolver.buffer = getReverbBuffer(c);
-    
     src.connect(filter); filter.connect(gain);
     gain.connect(c.destination); gain.connect(convolver); convolver.connect(c.destination);
-    
     src.start(t);
   } catch(e){}
 }
@@ -422,14 +453,13 @@ function triggerRecess() { playThud(0.18, 1); playThud(0.46, .85); if(navigator.
 function triggerIrrelevant() { playThud(); if(navigator.vibrate) navigator.vibrate([60]); doSwing(); document.getElementById('irrelevantOv').classList.add('show'); }
 function triggerNotGuilty() { playThud(0.18, .8); playThud(0.40, .65); if(navigator.vibrate) navigator.vibrate([60,40,60]); doSwing(); document.getElementById('notguiltyOv').classList.add('show'); }
 
-/* 更新版死刑：重敲兩下後補一槍 */
 function triggerDeath() { 
   if(busy) return; busy = true; 
   playThud(0, 1.5); playThud(0.3, 1.8); 
   doSwing(); 
   if(navigator.vibrate) navigator.vibrate([200, 100, 250]); 
   setTimeout(() => { 
-    playGunshot(0, 1.2); // 槍響！
+    playGunshot(0, 1.2);
     document.getElementById('deathOv').classList.add('show'); 
     if(navigator.vibrate) navigator.vibrate([500]);
     busy = false; 
@@ -452,7 +482,6 @@ function closeCharge() { document.getElementById('chargeModal').classList.remove
 function closeChargeOutside(e) { if(e.target === document.getElementById('chargeModal')) closeCharge(); }
 function randomCharge() { const pool = lang === 'zh' ? CHARGES_ZH : CHARGES_EN; currentCharge = pool[Math.floor(Math.random() * pool.length)]; document.getElementById('chargeResult').textContent = currentCharge; document.getElementById('chargeInput').value = currentCharge; playThud(0, .4); }
 
-/* 直接送交判決書，不再需要確認按鈕 */
 function sendToVerdictWriter() { 
   const val = document.getElementById('chargeInput').value.trim(); 
   if(!val) {
@@ -478,8 +507,8 @@ async function generateVerdict() {
     return;
   }
 
-
-  const apiKey = "AIzaSyDnk3aUDb7_jJowy_DvgWDl0QYWsS6p-y4"; 
+  // 👇 將這裡的 "YOUR_API_KEY_HERE" 換成你真正的 Gemini API Key
+  const apiKey = "YOUR_API_KEY_HERE"; 
 
   const now = new Date();
   const dateStr = lang === 'zh' ? `中華民國${now.getFullYear()-1911}年${now.getMonth()+1}月${now.getDate()}日` : now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
