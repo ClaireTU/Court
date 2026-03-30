@@ -1,0 +1,156 @@
+
+/* ═══════════════════════════════
+   NEW FEATURES CSS
+═══════════════════════════════ */
+
+/* Conviction counter */
+.counter-row {
+  display: flex; justify-content: center;
+  margin: 0 0 4px; flex-shrink: 0;
+}
+.counter-box {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 16px;
+  border: 1px solid rgba(200,168,75,.18);
+  border-radius: 20px;
+  background: rgba(200,168,75,.05);
+}
+.counter-num {
+  font-family: 'Playfair Display', serif; font-weight: 900;
+  font-size: 22px; color: var(--gold-lt);
+  text-shadow: 0 0 12px rgba(200,168,75,.4);
+  min-width: 28px; text-align: center;
+}
+.counter-lbl {
+  font-size: 11px; color: rgba(200,168,75,.45);
+  letter-spacing: .12em;
+}
+
+/* Volume slider */
+.vol-row {
+  display: flex; align-items: center; gap: 8px;
+  width: min(340px, 92vw); margin: 6px 0 2px;
+  flex-shrink: 0;
+}
+.vol-icon { font-size: 14px; }
+.vol-row input[type=range] {
+  flex: 1; accent-color: var(--gold);
+  height: 3px; cursor: pointer;
+}
+
+/* New buttons */
+.btn-charge {
+  border-color: rgba(200,100,0,.4);
+  background: rgba(120,55,0,.1);
+  color: #f0a860;
+}
+.btn-charge::before { background: rgba(120,55,0,.2); }
+
+.btn-verdict-writer {
+  border-color: rgba(180,160,80,.4);
+  background: rgba(100,80,0,.1);
+  color: #e8d080;
+}
+.btn-verdict-writer::before { background: rgba(100,80,0,.2); }
+
+.btn-quote {
+  border-color: rgba(100,80,160,.4);
+  background: rgba(60,40,120,.1);
+  color: #b8a8f0;
+}
+.btn-quote::before { background: rgba(60,40,120,.2); }
+
+/* Judge Quote overlay */
+.quote-ov { background: rgba(5,3,12,.95); }
+.quote-box {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 14px;
+  padding: 40px 28px;
+  max-width: 88vw;
+}
+.quote-gavel { font-size: 52px; animation: judgeFloat 3s ease-in-out infinite; }
+@keyframes judgeFloat {
+  0%,100% { transform: translateY(0) rotate(-3deg); }
+  50%     { transform: translateY(-8px) rotate(3deg); }
+}
+.quote-text {
+  font-family: 'Noto Serif TC', serif; font-weight: 700;
+  font-size: clamp(16px, 4.5vw, 24px);
+  color: var(--gold-lt); text-align: center; line-height: 1.7;
+  letter-spacing: .06em;
+  text-shadow: 0 0 20px rgba(200,168,75,.3);
+}
+.quote-attr {
+  font-family: 'Playfair Display', serif; font-style: italic;
+  font-size: 12px; color: rgba(200,168,75,.45);
+  letter-spacing: .2em;
+}
+
+/* Charge modal */
+.charge-result {
+  width: 100%; padding: 12px 14px;
+  background: rgba(200,168,75,.06);
+  border: 1px solid rgba(200,168,75,.2);
+  border-radius: 4px;
+  font-size: 14px; font-weight: 700;
+  color: var(--gold-lt); text-align: center;
+  letter-spacing: .06em; line-height: 1.5;
+  min-height: 48px; display: flex; align-items: center; justify-content: center;
+}
+.charge-divider {
+  font-size: 11px; color: rgba(200,168,75,.3);
+  letter-spacing: .2em; text-align: center; width: 100%;
+  margin: 2px 0;
+}
+.charge-input {
+  width: 100%; padding: 9px 12px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(200,168,75,.2);
+  border-radius: 4px; color: var(--gold-lt);
+  font-family: 'Noto Serif TC', serif; font-size: 13px;
+  outline: none; letter-spacing: .06em;
+}
+.charge-input:focus { border-color: rgba(200,168,75,.5); }
+.charge-input::placeholder { color: rgba(200,168,75,.25); }
+
+/* Verdict Writer modal */
+.verdict-modal-box {
+  max-height: 88vh; overflow-y: auto;
+}
+.verdict-doc {
+  width: 100%; margin-top: 10px;
+  background: #1a1408;
+  border: 1px solid rgba(200,168,75,.3);
+  border-radius: 4px; padding: 16px 14px;
+}
+.vd-header {
+  font-family: 'Noto Serif TC', serif; font-weight: 900;
+  font-size: 15px; color: var(--gold-lt);
+  text-align: center; letter-spacing: .15em;
+  border-bottom: 1px solid rgba(200,168,75,.2);
+  padding-bottom: 8px; margin-bottom: 8px;
+}
+.vd-num {
+  font-size: 10px; color: rgba(200,168,75,.4);
+  text-align: center; letter-spacing: .1em;
+  margin-bottom: 10px;
+}
+.vd-body {
+  font-size: 12px; color: rgba(240,210,120,.75);
+  line-height: 1.9; letter-spacing: .04em;
+  white-space: pre-wrap;
+}
+.vd-seal {
+  font-size: 36px; text-align: center;
+  margin: 12px 0 6px; opacity: .35;
+  animation: sealGlow 3s ease-in-out infinite;
+}
+@keyframes sealGlow {
+  0%,100% { opacity: .25; } 50% { opacity: .5; }
+}
+.vd-footer {
+  font-size: 10px; color: rgba(200,168,75,.3);
+  text-align: center; letter-spacing: .06em;
+  line-height: 1.6; border-top: 1px solid rgba(200,168,75,.15);
+  padding-top: 8px; margin-top: 4px;
+}
