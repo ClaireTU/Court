@@ -247,16 +247,15 @@ function triggerGuilty() {
   const fl = document.getElementById('flash');
   fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go');
 
-  setTimeout(() => {
-    // Play custom audio OR synthesized beep
-    if (useCustomAudio && customAudioEl) {
-      customAudioEl.currentTime = 0;
-      customAudioEl.play().catch(()=>{});
-    }
+  // Play custom audio HERE (must be in direct user gesture context for iOS)
+  if (useCustomAudio && customAudioURL) {
+    const a = new Audio(customAudioURL);
+    a.play().catch(() => {});
+  }
 
+  setTimeout(() => {
     const ov = document.getElementById('verdictOv');
     ov.classList.add('show');
-
     setTimeout(() => {
       ov.classList.remove('show');
       busy = false;
@@ -385,10 +384,14 @@ function finishRecording() {
 }
 
 function playRecording() {
-  if (customAudioEl) {
-    customAudioEl.currentTime = 0;
-    customAudioEl.play().catch(()=>{});
-  }
+  if (!customAudioURL) return;
+  // Create fresh Audio instance each time — required by iOS Safari
+  const a = new Audio(customAudioURL);
+  a.play().catch(() => {
+    alert(lang === 'zh'
+      ? '播放失敗，請確認瀏覽器允許音訊播放。'
+      : 'Playback failed. Please allow audio in your browser.');
+  });
 }
 
 function deleteRecording() {
