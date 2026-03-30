@@ -225,6 +225,97 @@ function playThud(delay=0,vol=1.0){try{const c=getAC(),t=c.currentTime+delay,sr=
 
 function playGunshot(delay=0,vol=1.0){try{const c=getAC(),t=c.currentTime+delay,buf=c.createBuffer(1,c.sampleRate*2,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++){const s=i/c.sampleRate;d[i]=(Math.random()*2-1)*Math.exp(-s*4);}const src=c.createBufferSource();src.buffer=buf;const f=c.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(4000,t);f.frequency.exponentialRampToValueAtTime(200,t+0.5);const g=c.createGain();g.gain.setValueAtTime(vol*volume*3.0,t);g.gain.exponentialRampToValueAtTime(0.01,t+1.5);const conv=c.createConvolver();conv.buffer=getReverbBuffer(c);src.connect(f);f.connect(g);g.connect(c.destination);g.connect(conv);conv.connect(c.destination);src.start(t);}catch(e){}}
 
+/* ══════════════════════════════════════════
+   🔊 自訂音效系統 — 合成 + 可替換外部檔案
+   ══════════════════════════════════════════
+   要替換成真實音效，只需放入音檔並修改下面的路徑：
+   - RECESS_AUDIO_URL: 退朝/休庭音效 (例如: 'sounds/recess.mp3')
+   - SILENCE_AUDIO_URL: 肅靜音效 (例如: 'sounds/silence.mp3')
+   設為 null 時使用程式合成音效 */
+const RECESS_AUDIO_URL = null;  // ← 換成 'sounds/recess.mp3' 即可替換
+const SILENCE_AUDIO_URL = null; // ← 換成 'sounds/silence.mp3' 即可替換
+
+function playExternalAudio(url) {
+  if (!url) return false;
+  try { const a = new Audio(url); a.volume = volume; a.play().catch(()=>{}); return true; } catch(e) { return false; }
+}
+
+/* 🏛 退朝大鑼 — 宮殿銅鑼 + 悠長迴音 */
+function playRecessGong(delay=0, vol=1.0) {
+  if (playExternalAudio(RECESS_AUDIO_URL)) return;
+  try {
+    const c = getAC(), t = c.currentTime + delay, sr = c.sampleRate;
+    // 主鑼聲 — 大銅鑼的基頻 + 泛音
+    const len = Math.floor(sr * 4);
+    const buf = c.createBuffer(1, len, sr);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) {
+      const s = i / sr;
+      const strike  = Math.exp(-s * 80) * (Math.random()*2-1) * 2.0;     // 初始撞擊噪音
+      const fund    = Math.exp(-s * 1.2) * Math.sin(2*Math.PI*120*s) * 1.0; // 基頻 ~120Hz 深沉銅鑼
+      const harm2   = Math.exp(-s * 1.5) * Math.sin(2*Math.PI*280*s) * 0.6; // 二次泛音
+      const harm3   = Math.exp(-s * 2.0) * Math.sin(2*Math.PI*520*s) * 0.3; // 三次泛音 — 金屬感
+      const shimmer = Math.exp(-s * 2.5) * Math.sin(2*Math.PI*880*s + Math.sin(s*6)*0.5) * 0.15; // 高頻閃爍
+      d[i] = strike + fund + harm2 + harm3 + shimmer;
+    }
+    const src = c.createBufferSource(); src.buffer = buf;
+    // 迴音 — 模擬宮殿大廳
+    const conv = c.createConvolver(); conv.buffer = getReverbBuffer(c);
+    const dryG = c.createGain(); dryG.gain.setValueAtTime(vol*volume*1.5, t);
+    const wetG = c.createGain(); wetG.gain.setValueAtTime(vol*volume*1.2, t);
+    src.connect(dryG); src.connect(conv); conv.connect(wetG);
+    dryG.connect(c.destination); wetG.connect(c.destination);
+    src.start(t);
+
+    // 第二聲小鑼 — 間隔 1.2 秒，音量較小
+    setTimeout(() => {
+      try {
+        const src2 = c.createBufferSource(); src2.buffer = buf;
+        const g2 = c.createGain(); g2.gain.setValueAtTime(vol*volume*0.6, c.currentTime);
+        const conv2 = c.createConvolver(); conv2.buffer = getReverbBuffer(c);
+        const wg2 = c.createGain(); wg2.gain.setValueAtTime(vol*volume*0.5, c.currentTime);
+        src2.connect(g2); src2.connect(conv2); conv2.connect(wg2);
+        g2.connect(c.destination); wg2.connect(c.destination);
+        src2.start(c.currentTime);
+      } catch(e){}
+    }, 1200);
+  } catch(e) {}
+}
+
+/* 📢 威嚴肅靜聲 — 驚堂木 + 低頻威壓 + 迴盪 */
+function playSilenceShout(delay=0, vol=1.0) {
+  if (playExternalAudio(SILENCE_AUDIO_URL)) return;
+  try {
+    const c = getAC(), t = c.currentTime + delay, sr = c.sampleRate;
+    const len = Math.floor(sr * 1.5);
+    const buf = c.createBuffer(1, len, sr);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) {
+      const s = i / sr;
+      // 驚堂木爆裂聲
+      const crack = Math.exp(-s * 200) * (Math.random()*2-1) * 3.0;
+      // 低頻威壓感 — 像有人在大聲喝斥
+      const shout = Math.exp(-s * 3) * Math.sin(2*Math.PI*160*s) * 0.8
+                  + Math.exp(-s * 3.5) * Math.sin(2*Math.PI*320*s) * 0.4
+                  + Math.exp(-s * 4) * Math.sin(2*Math.PI*480*s + Math.sin(s*12)*0.3) * 0.2;
+      // 木頭共振
+      const wood = Math.exp(-s * 30) * Math.sin(2*Math.PI*800*s) * 0.5;
+      d[i] = crack + shout + wood;
+    }
+    const src = c.createBufferSource(); src.buffer = buf;
+    const conv = c.createConvolver(); conv.buffer = getReverbBuffer(c);
+    const dG = c.createGain(); dG.gain.setValueAtTime(vol*volume*2.5, t);
+    const wG = c.createGain(); wG.gain.setValueAtTime(vol*volume*1.5, t);
+    src.connect(dG); src.connect(conv); conv.connect(wG);
+    dG.connect(c.destination); wG.connect(c.destination);
+    src.start(t);
+
+    // 連續三下驚堂木
+    setTimeout(() => playThud(0, 1.2), 300);
+    setTimeout(() => playThud(0, 1.0), 550);
+  } catch(e) {}
+}
+
 function setVolume(v){volume=v/100;}
 function playSilenceThree(){playThud(0.18,1);playThud(0.40,.9);playThud(0.62,.8);}
 function setLang(l){lang=l;applyTranslations();document.getElementById('langScreen').classList.add('hidden');document.getElementById('appScreen').classList.remove('hidden');}
@@ -234,8 +325,8 @@ function applyTranslations(){const t=T[lang];[['courtLabel','court'],['tapHint',
 function doSwing(){const arm=document.getElementById('armWrap');arm.classList.remove('strike');void arm.offsetWidth;arm.classList.add('strike');arm.addEventListener('animationend',()=>arm.classList.remove('strike'),{once:true});['ring1','ring2'].forEach(id=>{const r=document.getElementById(id);r.classList.remove('pop');void r.offsetWidth;r.classList.add('pop');});const fl=document.getElementById('flash');fl.classList.remove('go');void fl.offsetWidth;fl.classList.add('go');if(navigator.vibrate)navigator.vibrate([70]);}
 function strikeGavel(){if(busy)return;playThud();doSwing();}
 function triggerGuilty(){if(busy)return;busy=true;playThud();doSwing();if(navigator.vibrate)navigator.vibrate([100,40,80]);if(useCustomAudio&&customAudioURL){new Audio(customAudioURL).play().catch(()=>{});}setTimeout(()=>{const ov=document.getElementById('verdictOv');ov.classList.add('show');setTimeout(()=>{ov.classList.remove('show');convictions++;document.getElementById('convictionCount').textContent=convictions;busy=false;},1850);},160);}
-function triggerSilence(){playSilenceThree();if(navigator.vibrate)navigator.vibrate([80,50,80,50,80]);doSwing();document.getElementById('silenceOv').classList.add('show');}
-function triggerRecess(){playThud(0.18,1);playThud(0.46,.85);if(navigator.vibrate)navigator.vibrate([120,60,120]);doSwing();document.getElementById('recessOv').classList.add('show');}
+function triggerSilence(){playSilenceShout(0,1.2);if(navigator.vibrate)navigator.vibrate([150,50,150,50,150]);doSwing();document.getElementById('silenceOv').classList.add('show');}
+function triggerRecess(){playRecessGong(0,1.0);if(navigator.vibrate)navigator.vibrate([200,100,200]);doSwing();document.getElementById('recessOv').classList.add('show');}
 function triggerIrrelevant(){playThud();if(navigator.vibrate)navigator.vibrate([60]);doSwing();document.getElementById('irrelevantOv').classList.add('show');}
 function triggerNotGuilty(){playThud(0.18,.8);playThud(0.40,.65);if(navigator.vibrate)navigator.vibrate([60,40,60]);doSwing();document.getElementById('notguiltyOv').classList.add('show');}
 function triggerDeath(){if(busy)return;busy=true;playThud(0,1.5);playThud(0.3,1.8);doSwing();if(navigator.vibrate)navigator.vibrate([200,100,250]);setTimeout(()=>{playGunshot(0,1.2);document.getElementById('deathOv').classList.add('show');if(navigator.vibrate)navigator.vibrate([500]);busy=false;},700);}
@@ -250,13 +341,13 @@ function openVerdictWriter(){document.getElementById('verdictDoc').classList.add
 function closeVerdictWriter(){document.getElementById('verdictModal').classList.remove('show');}
 function closeVerdictOutside(e){if(e.target===document.getElementById('verdictModal'))closeVerdictWriter();}
 
-
+/* ✅ 修復版 generateVerdict — 改用 gemini-2.0-flash + 自動重試 + 離線備用 */
 async function generateVerdict(){
   const name=document.getElementById('defendantName').value.trim();
   const crime=document.getElementById('crimeInput').value.trim();
   if(!name||!crime){alert(lang==='zh'?'請填入被告姓名與罪名':'Please enter defendant name and charge');return;}
 
-  const apiKey="AIzaSyDnk3aUDb7_jJowy_DvgWDl0QYWsS6p-y4";
+  const apiKey="YOUR_API_KEY_HERE";
   const now=new Date();
   const dateStr=lang==='zh'?`中華民國${now.getFullYear()-1911}年${now.getMonth()+1}月${now.getDate()}日`:now.toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   const caseNum=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${Math.floor(Math.random()*9000+1000)}`;
