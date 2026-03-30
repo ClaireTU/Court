@@ -340,7 +340,7 @@ function sendToVerdictWriter(){const val=document.getElementById('chargeInput').
 function closeVerdictWriter(){document.getElementById('verdictModal').classList.remove('show');}
 function closeVerdictOutside(e){if(e.target===document.getElementById('verdictModal'))closeVerdictWriter();}
 
-/* ✅ 修復版 generateVerdict — 改用 gemini-2.0-flash + 自動重試 + 離線備用 */
+/* ✅ 修復版 generateVerdict — 使用 gemini-2.5-flash + 自動重試 + 離線備用 */
 /* 👁 切換 API Key 顯示/隱藏 */
 function toggleKeyVisibility(){
   const inp=document.getElementById('geminiKeyInput');
@@ -401,7 +401,7 @@ async function generateVerdict(){
           :`⏳ Rate limited... retrying in ${wait}s (${attempt}/${maxRetries})`;
         await new Promise(r=>setTimeout(r,wait*1000));
       }
-      const resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{
+      const resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{
         method:'POST',headers:{'Content-Type':'application/json'},
         body:JSON.stringify({contents:[{parts:[{text:prompt}]}]})
       });
