@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gavel-cache-v2';
+const CACHE_NAME = 'gavel-cache-v3';
 
 // 這些是需要被存到手機裡離線使用的檔案
 const urlsToCache = [
