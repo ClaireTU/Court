@@ -1,33 +1,50 @@
-const CACHE = 'peoples-gavel-v9';
-const URLS = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
+const CACHE_NAME = 'gavel-cache-v2';
 
-// 安裝時快取所有資源，並立即啟用
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(URLS)).then(() => self.skipWaiting())
+// 這些是需要被存到手機裡離線使用的檔案
+const urlsToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  './icons/favicon.svg',
+  './icons/icon-192.png'
+];
+
+// 1. 安裝階段：下載檔案，並且「霸王硬上弓」強制安裝
+self.addEventListener('install', event => {
+  // 🔥 魔法指令 1：跳過等待狀態，強制立刻安裝新版！
+  self.skipWaiting(); 
+  
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
   );
 });
 
-// 啟用時刪除所有舊版快取
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(ks =>
-      Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))
-    ).then(() => self.clients.claim())
+// 2. 啟動階段：清除舊垃圾，接管畫面
+self.addEventListener('activate', event => {
+  // 🔥 魔法指令 2：立刻取得所有開啟中畫面的控制權！
+  event.waitUntil(self.clients.claim());
+  
+  // 🔥 魔法指令 3：無情刪除所有舊版本的快取檔案
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('刪除舊快取:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
   );
 });
 
-// Network-first 策略：優先從網路抓最新版，失敗才用快取
-self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    fetch(e.request)
-      .then(resp => {
-        // 成功從網路取得 → 更新快取
-        const clone = resp.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return resp;
-      })
-      .catch(() => caches.match(e.request)) // 離線時用快取
+// 3. 攔截網路請求 (Network First 策略：優先抓最新檔案，沒網路才用快取)
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    fetch(event.request).catch(() => {
+      return caches.match(event.request);
+    })
   );
-});
+});;
