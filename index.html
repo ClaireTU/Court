@@ -205,6 +205,9 @@
     .vd-seal { font-size:36px; text-align:center; margin:12px 0 6px; opacity:.35; animation:sealGlow 3s ease-in-out infinite; }
     @keyframes sealGlow { 0%,100%{opacity:.25} 50%{opacity:.5} }
     .vd-footer { font-size:10px; color:rgba(200,168,75,.3); text-align:center; letter-spacing:.06em; line-height:1.6; border-top:1px solid rgba(200,168,75,.15); padding-top:8px; margin-top:4px; }
+
+    /* 🆕 App 版本號顯示樣式 */
+    .app-version { position:fixed; bottom:6px; right:10px; font-size:10px; color:rgba(200,168,75,.4); letter-spacing:.05em; z-index:100; pointer-events:none; font-family:monospace; }
   </style>
 </head>
 <body>
@@ -250,7 +253,6 @@
 <div id="verdictModal" class="modal-bg" onclick="closeVerdictOutside(event)"><div class="modal-box verdict-modal-box" onclick="event.stopPropagation()"><h2 class="modal-title">📜 <span id="verdictWriterTitleLbl">判決書產生器</span></h2><p class="modal-desc" id="verdictWriterDescLbl">輸入被告資訊，本院即刻製發判決書</p><input type="text" class="charge-input" id="defendantName" placeholder="被告姓名"/><input type="text" class="charge-input" id="crimeInput" placeholder="罪名"/><button class="rec-btn start-btn" style="width:100%;" id="btnGenerateVerdict" onclick="generateVerdict()">⚖️ 製發判決書</button><div id="verdictDoc" class="verdict-doc hidden"><div class="vd-header" id="vdHeader">最高法院判決書</div><div class="vd-num" id="vdNum"></div><div class="vd-body" id="vdBody"></div><div class="vd-seal">⚖</div><div class="vd-footer" id="vdFooter"></div><button class="rec-btn play-btn" style="width:100%;margin-top:8px;" id="btnShareVerdict" onclick="shareVerdict()">📸 截圖分享</button></div><button class="modal-close-btn" onclick="closeVerdictWriter()">關閉</button></div></div>
 <div id="recordModal" class="modal-bg" onclick="closeRecordOutside(event)"><div class="modal-box" onclick="event.stopPropagation()"><h2 class="modal-title" id="modalTitle">🎙 錄音設定</h2><p class="modal-desc" id="modalDesc">錄製你的「有罪」宣判聲音</p><div class="rec-status" id="recStatus">尚未錄音</div><div class="rec-timer" id="recTimer" style="display:none">⏺ 00:00</div><div class="rec-btns"><button class="rec-btn start-btn" id="btnStartRec" onclick="startRecording()">⏺ 開始錄音</button><button class="rec-btn stop-btn hidden" id="btnStopRec" onclick="stopRecording()">⏹ 停止錄音</button><button class="rec-btn play-btn hidden" id="btnPlayRec" onclick="playRecording()">▶ 試聽</button><button class="rec-btn del-btn hidden" id="btnDelRec" onclick="deleteRecording()">🗑 刪除重錄</button></div><div class="modal-toggle"><label class="toggle-label"><input type="checkbox" id="useCustom" onchange="toggleCustom()"/> 使用自訂錄音</label></div><button class="modal-close-btn" onclick="closeRecord()">關閉</button></div></div>
 
-<!-- Timer overlay -->
 <div id="timerOv" class="overlay-full timer-ov" onclick="cancelTimer()">
   <div class="timer-box">
     <div class="timer-label" id="timerLabel">宣判倒數</div>
@@ -259,7 +261,6 @@
   </div>
 </div>
 
-<!-- Judge select modal -->
 <div id="judgeModal" class="modal-bg" onclick="closeJudgeOutside(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <h2 class="modal-title">🎭 <span id="judgeSelectTitle">選擇法官</span></h2>
@@ -268,7 +269,6 @@
   </div>
 </div>
 
-<!-- History modal -->
 <div id="historyModal" class="modal-bg" onclick="closeHistoryOutside(event)">
   <div class="modal-box verdict-modal-box" onclick="event.stopPropagation()">
     <h2 class="modal-title">📊 <span id="historyTitle">審判紀錄</span></h2>
@@ -277,6 +277,8 @@
     <button class="modal-close-btn" onclick="closeHistory()">關閉</button>
   </div>
 </div>
+
+<div id="appVersion" class="app-version"></div>
 
 <script>
 const T={zh:{court:'最高法院',tapHint:'點擊敲槌',lblGuilty:'有罪',subGuilty:'終身監禁不得假釋',lblSilence:'肅靜',lblRecess:'休庭',lblIrrelevant:'與本案無關',lblNotGuilty:'當庭無罪釋放',lblRecord:'錄音設定',lblCharge:'隨機罪名',lblVerdictWriter:'判決書',lblQuote:'法官語錄',switchBtn:'🌐 English',verdictMain:'有罪',verdictSub:'終身監禁不得假釋',silenceMain:'肅靜！',silenceSub:'SILENCE IN COURT',closeSilence:'解除',recessMain:'休庭',recessSub:'COURT IS IN RECESS',closeRecess:'恢復',irrelMain:'該陳述與本案無關',irrelSub:'IRRELEVANT TO THIS CASE',closeIrrel:'確定',ngMain:'無罪',ngSub:'NOT GUILTY — ACQUITTED',closeNg:'確定',counterLbl:'次定罪',modalTitle:'🎙 錄音設定',modalDesc:'錄製你的「有罪」宣判聲音',recReady:'準備就緒，可以錄音',recHasCustom:'已有自訂錄音',recRecording:'錄音中…',recDone:'錄音完成！',recDeleted:'已刪除',btnStartRec:'⏺ 開始錄音',btnStopRec:'⏹ 停止錄音',btnPlayRec:'▶ 試聽',btnDelRec:'🗑 刪除重錄',toggleLabel:'使用自訂錄音',closeModal:'關閉',chargeTitleLbl:'罪名產生器',verdictWriterTitleLbl:'判決書產生器',verdictWriterDescLbl:'輸入被告資訊，本院即刻製發判決書',vdHeader:'最高法院刑事判決書',vdFooter:'本判決書經本院院長用印，即日起生效，永久存入司法檔案。',quoteAttr:'— 法官大人',lblDeath:'死刑',subDeath:'立即執行，不得上訴',deathMain:'死刑',deathSub:'立即執行，不得上訴',closeDeath:'確定',btnRandom:'🎲 隨機產生',btnToWriter:'📜 送交判決書',btnGen:'⚖️ 製發判決書',btnShare:'📸 截圖分享',phDef:'被告姓名',phCrime:'罪名',phChargeInput:'輸入你的罪名...',lblJudge:'切換法官',lblTimer:'審判倒數',lblHistory:'審判紀錄',judgeSelectTitle:'選擇法官',historyTitle:'審判紀錄',btnClearHistory:'🗑 清除所有紀錄',timerLabel:'宣判倒數',timerNow:'判！',timerCancel:'取消',chargeDivider:'— 或自行輸入罪名 —',closeGuilty:'確定',closeQuote:'收下教誨'},en:{court:'Supreme Court of Justice',tapHint:'Tap to Strike',lblGuilty:'Guilty',subGuilty:'Life without parole',lblSilence:'Silence',lblRecess:'Recess',lblIrrelevant:'Irrelevant',lblNotGuilty:'Not Guilty',lblRecord:'Record Voice',lblCharge:'Random Charge',lblVerdictWriter:'Verdict',lblQuote:"Judge's Words",switchBtn:'🌐 中文',verdictMain:'GUILTY',verdictSub:'Life in prison without the possibility of parole.',silenceMain:'SILENCE!',silenceSub:'SILENCE IN COURT',closeSilence:'Dismiss',recessMain:'RECESS',recessSub:'COURT IS IN RECESS',closeRecess:'Resume',irrelMain:'IRRELEVANT',irrelSub:'IRRELEVANT TO THIS CASE',closeIrrel:'OK',ngMain:'NOT GUILTY',ngSub:'THE DEFENDANT IS HEREBY ACQUITTED',closeNg:'OK',counterLbl:'convictions',modalTitle:'🎙 Voice Recording',modalDesc:'Record your guilty verdict voice',recReady:'Ready to record',recHasCustom:'Custom recording saved',recRecording:'Recording…',recDone:'Recording complete!',recDeleted:'Deleted',btnStartRec:'⏺ Start Recording',btnStopRec:'⏹ Stop',btnPlayRec:'▶ Play Back',btnDelRec:'🗑 Delete',toggleLabel:'Use custom recording',closeModal:'Close',chargeTitleLbl:'Charge Generator',verdictWriterTitleLbl:'Verdict Writer',verdictWriterDescLbl:'Enter defendant info to generate a verdict',vdHeader:'SUPREME COURT CRIMINAL VERDICT',vdFooter:'This verdict is hereby sealed by the Chief Justice and takes immediate effect.',quoteAttr:'— The Honorable Judge',lblDeath:'Death Penalty',subDeath:'Execute immediately, no appeal',deathMain:'DEATH',deathSub:'SENTENCED TO DEATH — EXECUTE IMMEDIATELY',closeDeath:'Confirm',btnRandom:'🎲 Randomize',btnToWriter:'📜 Send to Verdict Writer',btnGen:'⚖️ Generate Verdict',btnShare:'📸 Share Screenshot',phDef:'Defendant Name',phCrime:'Charge',phChargeInput:'Enter your charge...',lblJudge:'Switch Judge',lblTimer:'Countdown',lblHistory:'Records',judgeSelectTitle:'Select Judge',historyTitle:'Trial Records',btnClearHistory:'🗑 Clear All Records',timerLabel:'VERDICT COUNTDOWN',timerNow:'NOW!',timerCancel:'Cancel',chargeDivider:'— or enter your own charge —',closeGuilty:'Confirm',closeQuote:'Duly Noted'}};
@@ -296,41 +298,31 @@ function playThud(delay=0,vol=1.0){try{const c=getAC(),t=c.currentTime+delay,sr=
 
 function playGunshot(delay=0,vol=1.0){try{const c=getAC(),t=c.currentTime+delay,buf=c.createBuffer(1,c.sampleRate*2,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<d.length;i++){const s=i/c.sampleRate;d[i]=(Math.random()*2-1)*Math.exp(-s*4);}const src=c.createBufferSource();src.buffer=buf;const f=c.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(4000,t);f.frequency.exponentialRampToValueAtTime(200,t+0.5);const g=c.createGain();g.gain.setValueAtTime(vol*volume*3.0,t);g.gain.exponentialRampToValueAtTime(0.01,t+1.5);const conv=c.createConvolver();conv.buffer=getReverbBuffer(c);src.connect(f);f.connect(g);g.connect(c.destination);g.connect(conv);conv.connect(c.destination);src.start(t);}catch(e){}}
 
-/* ══════════════════════════════════════════
-   🔊 自訂音效系統 — 合成 + 可替換外部檔案
-   ══════════════════════════════════════════
-   要替換成真實音效，只需放入音檔並修改下面的路徑：
-   - RECESS_AUDIO_URL: 退朝/休庭音效 (例如: 'sounds/recess.mp3')
-   - SILENCE_AUDIO_URL: 肅靜音效 (例如: 'sounds/silence.mp3')
-   設為 null 時使用程式合成音效 */
-const RECESS_AUDIO_URL = null;  // ← 換成 'sounds/recess.mp3' 即可替換
-const SILENCE_AUDIO_URL = null; // ← 換成 'sounds/silence.mp3' 即可替換
+const RECESS_AUDIO_URL = null; 
+const SILENCE_AUDIO_URL = null;
 
 function playExternalAudio(url) {
   if (!url) return false;
   try { const a = new Audio(url); a.volume = volume; a.play().catch(()=>{}); return true; } catch(e) { return false; }
 }
 
-/* 🏛 退朝大鑼 — 宮殿銅鑼 + 悠長迴音 */
 function playRecessGong(delay=0, vol=1.0) {
   if (playExternalAudio(RECESS_AUDIO_URL)) return;
   try {
     const c = getAC(), t = c.currentTime + delay, sr = c.sampleRate;
-    // 主鑼聲 — 大銅鑼的基頻 + 泛音
     const len = Math.floor(sr * 4);
     const buf = c.createBuffer(1, len, sr);
     const d = buf.getChannelData(0);
     for (let i = 0; i < len; i++) {
       const s = i / sr;
-      const strike  = Math.exp(-s * 80) * (Math.random()*2-1) * 2.0;     // 初始撞擊噪音
-      const fund    = Math.exp(-s * 1.2) * Math.sin(2*Math.PI*120*s) * 1.0; // 基頻 ~120Hz 深沉銅鑼
-      const harm2   = Math.exp(-s * 1.5) * Math.sin(2*Math.PI*280*s) * 0.6; // 二次泛音
-      const harm3   = Math.exp(-s * 2.0) * Math.sin(2*Math.PI*520*s) * 0.3; // 三次泛音 — 金屬感
-      const shimmer = Math.exp(-s * 2.5) * Math.sin(2*Math.PI*880*s + Math.sin(s*6)*0.5) * 0.15; // 高頻閃爍
+      const strike  = Math.exp(-s * 80) * (Math.random()*2-1) * 2.0;
+      const fund    = Math.exp(-s * 1.2) * Math.sin(2*Math.PI*120*s) * 1.0; 
+      const harm2   = Math.exp(-s * 1.5) * Math.sin(2*Math.PI*280*s) * 0.6; 
+      const harm3   = Math.exp(-s * 2.0) * Math.sin(2*Math.PI*520*s) * 0.3; 
+      const shimmer = Math.exp(-s * 2.5) * Math.sin(2*Math.PI*880*s + Math.sin(s*6)*0.5) * 0.15; 
       d[i] = strike + fund + harm2 + harm3 + shimmer;
     }
     const src = c.createBufferSource(); src.buffer = buf;
-    // 迴音 — 模擬宮殿大廳
     const conv = c.createConvolver(); conv.buffer = getReverbBuffer(c);
     const dryG = c.createGain(); dryG.gain.setValueAtTime(vol*volume*1.5, t);
     const wetG = c.createGain(); wetG.gain.setValueAtTime(vol*volume*1.2, t);
@@ -338,7 +330,6 @@ function playRecessGong(delay=0, vol=1.0) {
     dryG.connect(c.destination); wetG.connect(c.destination);
     src.start(t);
 
-    // 第二聲小鑼 — 間隔 1.2 秒，音量較小
     setTimeout(() => {
       try {
         const src2 = c.createBufferSource(); src2.buffer = buf;
@@ -353,7 +344,6 @@ function playRecessGong(delay=0, vol=1.0) {
   } catch(e) {}
 }
 
-/* 📢 威嚴肅靜聲 — 驚堂木 + 低頻威壓 + 迴盪 */
 function playSilenceShout(delay=0, vol=1.0) {
   if (playExternalAudio(SILENCE_AUDIO_URL)) return;
   try {
@@ -363,13 +353,10 @@ function playSilenceShout(delay=0, vol=1.0) {
     const d = buf.getChannelData(0);
     for (let i = 0; i < len; i++) {
       const s = i / sr;
-      // 驚堂木爆裂聲
       const crack = Math.exp(-s * 200) * (Math.random()*2-1) * 3.0;
-      // 低頻威壓感 — 像有人在大聲喝斥
       const shout = Math.exp(-s * 3) * Math.sin(2*Math.PI*160*s) * 0.8
                   + Math.exp(-s * 3.5) * Math.sin(2*Math.PI*320*s) * 0.4
                   + Math.exp(-s * 4) * Math.sin(2*Math.PI*480*s + Math.sin(s*12)*0.3) * 0.2;
-      // 木頭共振
       const wood = Math.exp(-s * 30) * Math.sin(2*Math.PI*800*s) * 0.5;
       d[i] = crack + shout + wood;
     }
@@ -381,7 +368,6 @@ function playSilenceShout(delay=0, vol=1.0) {
     dG.connect(c.destination); wG.connect(c.destination);
     src.start(t);
 
-    // 連續三下驚堂木
     setTimeout(() => playThud(0, 1.2), 300);
     setTimeout(() => playThud(0, 1.0), 550);
   } catch(e) {}
@@ -413,15 +399,11 @@ function sendToVerdictWriter(){const val=document.getElementById('chargeInput').
 function closeVerdictWriter(){document.getElementById('verdictModal').classList.remove('show');}
 function closeVerdictOutside(e){if(e.target===document.getElementById('verdictModal'))closeVerdictWriter();}
 
-/* ✅ 修復版 generateVerdict — 透過 Worker 使用 gemini-2.5-flash-lite（最快）+ 自動重試 + 離線備用 */
-/* 👁 切換 API Key 顯示/隱藏 */
 function openVerdictWriter(){
   document.getElementById('verdictDoc').classList.add('hidden');
   document.getElementById('verdictModal').classList.add('show');
 }
 
-/* 🌐 Cloudflare Worker Proxy — API Key 藏在後端
-   ← 把下面的網址換成你的 Worker 網址 */
 const WORKER_URL = "https://floral-mountain-4587.claire881015.workers.dev";
 
 async function generateVerdict(){
@@ -482,7 +464,6 @@ async function generateVerdict(){
   }
 }
 
-
 function generateOfflineVerdict(name,crime){
   if(lang==='zh'){
     const p=['罰每日凌晨三點起床對著鏡子朗讀道歉信一百遍','罰連續一個月只能吃白飯配醬油','罰在全公司面前跳三分鐘的雞舞','罰每週五請全辦公室吃雞排，為期一年','罰手機沒收三個月，只能用公共電話','罰抄寫「我再也不敢了」一萬遍','罰穿「我有罪」T恤上班一個月'][Math.floor(Math.random()*7)];
@@ -506,9 +487,6 @@ function toggleCustom(){useCustomAudio=document.getElementById('useCustom').chec
 function updateRecStatus(){const el=document.getElementById('recStatus');if(!el)return;if(customAudioEl){el.textContent=T[lang].recHasCustom;document.getElementById('btnStartRec').classList.add('hidden');document.getElementById('btnPlayRec').classList.remove('hidden');document.getElementById('btnDelRec').classList.remove('hidden');}else{el.textContent=T[lang].recReady;document.getElementById('btnStartRec').classList.remove('hidden');document.getElementById('btnPlayRec').classList.add('hidden');document.getElementById('btnDelRec').classList.add('hidden');}}
 function updateTimer(){recSeconds++;const m=String(Math.floor(recSeconds/60)).padStart(2,'0'),s=String(recSeconds%60).padStart(2,'0');document.getElementById('recTimer').textContent=`⏺ ${m}:${s}`;}
 
-/* ══════════════════════════════════════
-   🎭 法官角色系統
-   ══════════════════════════════════════ */
 const JUDGES = [
   { id:'modern', emoji:'👨‍⚖️', 
     zh:{name:'現代法官',desc:'嚴謹專業，依法判決'},
@@ -546,7 +524,6 @@ function selectJudge(j){
   const info = j[lang] || j.zh;
   document.getElementById('jiEmoji').textContent = j.emoji;
   document.getElementById('jiName').textContent = info.name;
-  // Update all cards
   document.querySelectorAll('.judge-card').forEach((card,i) => {
     card.classList.toggle('active', JUDGES[i].id===j.id);
   });
@@ -554,9 +531,6 @@ function selectJudge(j){
   setTimeout(closeJudgeSelect, 400);
 }
 
-/* ══════════════════════════════════════
-   ⏱ 審判倒數計時器
-   ══════════════════════════════════════ */
 let countdownInterval = null;
 
 function openTimer(){
@@ -595,9 +569,6 @@ function cancelTimer(){
   document.getElementById('timerOv').classList.remove('show');
 }
 
-/* ══════════════════════════════════════
-   📊 歷史審判紀錄
-   ══════════════════════════════════════ */
 function getHistory(){
   try{return JSON.parse(localStorage.getItem('gavelHistory')||'[]');}catch(e){return [];}
 }
@@ -609,7 +580,7 @@ function saveToHistory(name, crime, verdict, result){
     date: new Date().toLocaleString(lang==='zh'?'zh-TW':'en-US'),
     ts: Date.now()
   });
-  if(history.length > 50) history.length = 50; // keep last 50
+  if(history.length > 50) history.length = 50;
   localStorage.setItem('gavelHistory', JSON.stringify(history));
 }
 
@@ -634,14 +605,12 @@ function closeHistoryOutside(e){if(e.target===document.getElementById('historyMo
 function clearHistory(){
   if(!confirm(lang==='zh'?'確定清除所有審判紀錄？':'Clear all records?'))return;
   localStorage.removeItem('gavelHistory');
-  openHistory(); // refresh
+  openHistory();
 }
 
-/* Auto-save verdicts to history */
 const _origTriggerGuilty = triggerGuilty;
 triggerGuilty = function(){
   _origTriggerGuilty();
-  // Save after overlay shows
   setTimeout(()=>{
     const crime = currentCharge || (lang==='zh'?'未指定罪名':'Unspecified');
     saveToHistory(lang==='zh'?'被告':'Defendant', crime, '', 'guilty');
@@ -666,26 +635,34 @@ triggerNotGuilty = function(){
   }, 300);
 };
 ['btnCloseSilence','btnCloseRecess','btnCloseIrrelevant','btnCloseNotGuilty','btnCloseDeath','btnCloseGuilty'].forEach(id=>{const btn=document.getElementById(id);if(btn)btn.addEventListener('click',e=>{e.stopPropagation();closeOverlay({btnCloseSilence:'silenceOv',btnCloseRecess:'recessOv',btnCloseIrrelevant:'irrelevantOv',btnCloseNotGuilty:'notguiltyOv',btnCloseDeath:'deathOv',btnCloseGuilty:'verdictOv'}[id]);});});
-/* pinch zoom enabled */
-</script>
-<script>
+
+/* ══════════════════════════════════════
+   🚀 PWA Service Worker 與版本偵測
+   ══════════════════════════════════════ */
+// 1. 自動讀取 sw.js 中的版號並顯示在右下角
+fetch('sw.js?t=' + new Date().getTime()).then(r=>r.text()).then(text=>{
+  const match = text.match(/CACHE_NAME\s*=\s*['"]([^'"]+)['"]/);
+  if(match && match[1]) {
+    // 取出最後的版號，例如 gavel-cache-v2 會變成 v2
+    const v = match[1].split('-').pop();
+    document.getElementById('appVersion').textContent = 'ver: ' + v;
+  }
+}).catch(()=>{});
+
+// 2. 註冊 SW 並監聽自動更新
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(reg => {
-    // 監聽是否有新版的 sw.js 被安裝
     reg.addEventListener('updatefound', () => {
       const newWorker = reg.installing;
       newWorker.addEventListener('statechange', () => {
-        // 當新版下載完成，且目前畫面上已經有舊版在控制時
         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-          console.log('發現新版本法槌，自動重新載入中...');
-          // 自動重新整理網頁來套用最新快取
+          // 發現新版快取，強制重新載入網頁
           window.location.reload();
         }
       });
     });
-  }).catch(err => console.error('Service Worker 註冊失敗:', err));
+  }).catch(err => console.error('SW 註冊失敗:', err));
 
-  // 確保 Service Worker 控制權轉交時也更新畫面 (配合 sw.js 裡的 skipWaiting)
   let refreshing;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (refreshing) return;
