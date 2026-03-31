@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="zh-TW" id="html-root">
 <head>
   <meta charset="UTF-8"/>
@@ -33,6 +33,9 @@
     .lang-flag { font-size:28px; }
     .lang-name { font-family:'Playfair Display',serif; font-weight:700; font-size:16px; color:var(--gold-lt); }
     .lang-desc { font-size:11px; color:rgba(200,168,75,.4); }
+
+    /* 🆕 版本號樣式：置中、提高距離底部 40px，避免被手機安全區擋住 */
+    .app-version { position:absolute; bottom:40px; left:0; width:100%; text-align:center; font-size:11px; color:rgba(200,168,75,.3); letter-spacing:.1em; pointer-events:none; font-family:monospace; }
 
     .app-screen { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; background:radial-gradient(ellipse at 50% 30%,#1a1408 0%,#0e0c08 60%,#060504 100%); padding:12px 0 0; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; }
     .top-bar { display:flex; align-items:center; gap:12px; width:90%; max-width:380px; flex-shrink:0; }
@@ -205,13 +208,22 @@
     .vd-seal { font-size:36px; text-align:center; margin:12px 0 6px; opacity:.35; animation:sealGlow 3s ease-in-out infinite; }
     @keyframes sealGlow { 0%,100%{opacity:.25} 50%{opacity:.5} }
     .vd-footer { font-size:10px; color:rgba(200,168,75,.3); text-align:center; letter-spacing:.06em; line-height:1.6; border-top:1px solid rgba(200,168,75,.15); padding-top:8px; margin-top:4px; }
-
-    /* 🆕 App 版本號顯示樣式 */
-    .app-version { position:fixed; bottom:6px; right:10px; font-size:10px; color:rgba(200,168,75,.4); letter-spacing:.05em; z-index:100; pointer-events:none; font-family:monospace; }
   </style>
 </head>
 <body>
-<div id="langScreen" class="lang-screen"><div class="lang-inner"><div class="lang-emblem">⚖</div><h1 class="lang-title">People's Gavel<br/>人民的法槌</h1><p class="lang-sub">Please select your language / 請選擇語言</p><div class="lang-btns"><button class="lang-btn" onclick="setLang('zh')"><span class="lang-flag">🇹🇼</span><span class="lang-name">中文版</span><span class="lang-desc">繁體中文</span></button><button class="lang-btn" onclick="setLang('en')"><span class="lang-flag">🇺🇸</span><span class="lang-name">English</span><span class="lang-desc">English Version</span></button></div></div></div>
+<div id="langScreen" class="lang-screen">
+  <div class="lang-inner">
+    <div class="lang-emblem">⚖</div>
+    <h1 class="lang-title">People's Gavel<br/>人民的法槌</h1>
+    <p class="lang-sub">Please select your language / 請選擇語言</p>
+    <div class="lang-btns">
+      <button class="lang-btn" onclick="setLang('zh')"><span class="lang-flag">🇹🇼</span><span class="lang-name">中文版</span><span class="lang-desc">繁體中文</span></button>
+      <button class="lang-btn" onclick="setLang('en')"><span class="lang-flag">🇺🇸</span><span class="lang-name">English</span><span class="lang-desc">English Version</span></button>
+    </div>
+  </div>
+  <div id="appVersion" class="app-version"></div>
+</div>
+
 <div id="appScreen" class="app-screen hidden">
   <div class="top-bar"><div class="bar-line"></div><div class="court-label" id="courtLabel">最高法院</div><div class="bar-line"></div></div>
   <div class="counter-row"><div class="counter-box"><span class="counter-num" id="convictionCount">0</span><span class="counter-lbl" id="counterLbl">次定罪</span></div></div>
@@ -277,8 +289,6 @@
     <button class="modal-close-btn" onclick="closeHistory()">關閉</button>
   </div>
 </div>
-
-<div id="appVersion" class="app-version"></div>
 
 <script>
 const T={zh:{court:'最高法院',tapHint:'點擊敲槌',lblGuilty:'有罪',subGuilty:'終身監禁不得假釋',lblSilence:'肅靜',lblRecess:'休庭',lblIrrelevant:'與本案無關',lblNotGuilty:'當庭無罪釋放',lblRecord:'錄音設定',lblCharge:'隨機罪名',lblVerdictWriter:'判決書',lblQuote:'法官語錄',switchBtn:'🌐 English',verdictMain:'有罪',verdictSub:'終身監禁不得假釋',silenceMain:'肅靜！',silenceSub:'SILENCE IN COURT',closeSilence:'解除',recessMain:'休庭',recessSub:'COURT IS IN RECESS',closeRecess:'恢復',irrelMain:'該陳述與本案無關',irrelSub:'IRRELEVANT TO THIS CASE',closeIrrel:'確定',ngMain:'無罪',ngSub:'NOT GUILTY — ACQUITTED',closeNg:'確定',counterLbl:'次定罪',modalTitle:'🎙 錄音設定',modalDesc:'錄製你的「有罪」宣判聲音',recReady:'準備就緒，可以錄音',recHasCustom:'已有自訂錄音',recRecording:'錄音中…',recDone:'錄音完成！',recDeleted:'已刪除',btnStartRec:'⏺ 開始錄音',btnStopRec:'⏹ 停止錄音',btnPlayRec:'▶ 試聽',btnDelRec:'🗑 刪除重錄',toggleLabel:'使用自訂錄音',closeModal:'關閉',chargeTitleLbl:'罪名產生器',verdictWriterTitleLbl:'判決書產生器',verdictWriterDescLbl:'輸入被告資訊，本院即刻製發判決書',vdHeader:'最高法院刑事判決書',vdFooter:'本判決書經本院院長用印，即日起生效，永久存入司法檔案。',quoteAttr:'— 法官大人',lblDeath:'死刑',subDeath:'立即執行，不得上訴',deathMain:'死刑',deathSub:'立即執行，不得上訴',closeDeath:'確定',btnRandom:'🎲 隨機產生',btnToWriter:'📜 送交判決書',btnGen:'⚖️ 製發判決書',btnShare:'📸 截圖分享',phDef:'被告姓名',phCrime:'罪名',phChargeInput:'輸入你的罪名...',lblJudge:'切換法官',lblTimer:'審判倒數',lblHistory:'審判紀錄',judgeSelectTitle:'選擇法官',historyTitle:'審判紀錄',btnClearHistory:'🗑 清除所有紀錄',timerLabel:'宣判倒數',timerNow:'判！',timerCancel:'取消',chargeDivider:'— 或自行輸入罪名 —',closeGuilty:'確定',closeQuote:'收下教誨'},en:{court:'Supreme Court of Justice',tapHint:'Tap to Strike',lblGuilty:'Guilty',subGuilty:'Life without parole',lblSilence:'Silence',lblRecess:'Recess',lblIrrelevant:'Irrelevant',lblNotGuilty:'Not Guilty',lblRecord:'Record Voice',lblCharge:'Random Charge',lblVerdictWriter:'Verdict',lblQuote:"Judge's Words",switchBtn:'🌐 中文',verdictMain:'GUILTY',verdictSub:'Life in prison without the possibility of parole.',silenceMain:'SILENCE!',silenceSub:'SILENCE IN COURT',closeSilence:'Dismiss',recessMain:'RECESS',recessSub:'COURT IS IN RECESS',closeRecess:'Resume',irrelMain:'IRRELEVANT',irrelSub:'IRRELEVANT TO THIS CASE',closeIrrel:'OK',ngMain:'NOT GUILTY',ngSub:'THE DEFENDANT IS HEREBY ACQUITTED',closeNg:'OK',counterLbl:'convictions',modalTitle:'🎙 Voice Recording',modalDesc:'Record your guilty verdict voice',recReady:'Ready to record',recHasCustom:'Custom recording saved',recRecording:'Recording…',recDone:'Recording complete!',recDeleted:'Deleted',btnStartRec:'⏺ Start Recording',btnStopRec:'⏹ Stop',btnPlayRec:'▶ Play Back',btnDelRec:'🗑 Delete',toggleLabel:'Use custom recording',closeModal:'Close',chargeTitleLbl:'Charge Generator',verdictWriterTitleLbl:'Verdict Writer',verdictWriterDescLbl:'Enter defendant info to generate a verdict',vdHeader:'SUPREME COURT CRIMINAL VERDICT',vdFooter:'This verdict is hereby sealed by the Chief Justice and takes immediate effect.',quoteAttr:'— The Honorable Judge',lblDeath:'Death Penalty',subDeath:'Execute immediately, no appeal',deathMain:'DEATH',deathSub:'SENTENCED TO DEATH — EXECUTE IMMEDIATELY',closeDeath:'Confirm',btnRandom:'🎲 Randomize',btnToWriter:'📜 Send to Verdict Writer',btnGen:'⚖️ Generate Verdict',btnShare:'📸 Share Screenshot',phDef:'Defendant Name',phCrime:'Charge',phChargeInput:'Enter your charge...',lblJudge:'Switch Judge',lblTimer:'Countdown',lblHistory:'Records',judgeSelectTitle:'Select Judge',historyTitle:'Trial Records',btnClearHistory:'🗑 Clear All Records',timerLabel:'VERDICT COUNTDOWN',timerNow:'NOW!',timerCancel:'Cancel',chargeDivider:'— or enter your own charge —',closeGuilty:'Confirm',closeQuote:'Duly Noted'}};
@@ -636,14 +646,10 @@ triggerNotGuilty = function(){
 };
 ['btnCloseSilence','btnCloseRecess','btnCloseIrrelevant','btnCloseNotGuilty','btnCloseDeath','btnCloseGuilty'].forEach(id=>{const btn=document.getElementById(id);if(btn)btn.addEventListener('click',e=>{e.stopPropagation();closeOverlay({btnCloseSilence:'silenceOv',btnCloseRecess:'recessOv',btnCloseIrrelevant:'irrelevantOv',btnCloseNotGuilty:'notguiltyOv',btnCloseDeath:'deathOv',btnCloseGuilty:'verdictOv'}[id]);});});
 
-/* ══════════════════════════════════════
-   🚀 PWA Service Worker 與版本偵測
-   ══════════════════════════════════════ */
-// 1. 自動讀取 sw.js 中的版號並顯示在右下角
+// 1. 自動讀取 sw.js 中的版號並顯示在入口頁面底部
 fetch('sw.js?t=' + new Date().getTime()).then(r=>r.text()).then(text=>{
   const match = text.match(/CACHE_NAME\s*=\s*['"]([^'"]+)['"]/);
   if(match && match[1]) {
-    // 取出最後的版號，例如 gavel-cache-v2 會變成 v2
     const v = match[1].split('-').pop();
     document.getElementById('appVersion').textContent = 'ver: ' + v;
   }
@@ -656,7 +662,6 @@ if ('serviceWorker' in navigator) {
       const newWorker = reg.installing;
       newWorker.addEventListener('statechange', () => {
         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-          // 發現新版快取，強制重新載入網頁
           window.location.reload();
         }
       });
