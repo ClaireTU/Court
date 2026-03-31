@@ -668,6 +668,31 @@ triggerNotGuilty = function(){
 ['btnCloseSilence','btnCloseRecess','btnCloseIrrelevant','btnCloseNotGuilty','btnCloseDeath','btnCloseGuilty'].forEach(id=>{const btn=document.getElementById(id);if(btn)btn.addEventListener('click',e=>{e.stopPropagation();closeOverlay({btnCloseSilence:'silenceOv',btnCloseRecess:'recessOv',btnCloseIrrelevant:'irrelevantOv',btnCloseNotGuilty:'notguiltyOv',btnCloseDeath:'deathOv',btnCloseGuilty:'verdictOv'}[id]);});});
 /* pinch zoom enabled */
 </script>
-<script>if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // 監聽是否有新版的 sw.js 被安裝
+    reg.addEventListener('updatefound', () => {
+      const newWorker = reg.installing;
+      newWorker.addEventListener('statechange', () => {
+        // 當新版下載完成，且目前畫面上已經有舊版在控制時
+        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+          console.log('發現新版本法槌，自動重新載入中...');
+          // 自動重新整理網頁來套用最新快取
+          window.location.reload();
+        }
+      });
+    });
+  }).catch(err => console.error('Service Worker 註冊失敗:', err));
+
+  // 確保 Service Worker 控制權轉交時也更新畫面 (配合 sw.js 裡的 skipWaiting)
+  let refreshing;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (refreshing) return;
+    window.location.reload();
+    refreshing = true;
+  });
+}
+</script>
 </body>
 </html>
