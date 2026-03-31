@@ -1,4 +1,4 @@
-const CACHE = 'peoples-gavel-v2';
+const CACHE = 'peoples-gavel-v3';
 const URLS = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
 
 // 安裝時快取所有資源，並立即啟用
